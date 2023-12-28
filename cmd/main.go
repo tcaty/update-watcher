@@ -1,7 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"github.com/tcaty/update-watcher/internal/watcher"
+	"github.com/tcaty/update-watcher/internal/watcher/grafanadashboards"
+)
 
 func main() {
-	fmt.Println("Hello from main!")
+	gdw := grafanadashboards.NewWatcher()
+	watcher.Tick(gdw)
 }
