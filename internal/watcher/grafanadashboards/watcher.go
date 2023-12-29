@@ -24,14 +24,17 @@ func (w *Watcher) GetLastVersion() (string, error) {
 		return "", fmt.Errorf("cannot get grafanadashboards url: %v", err)
 	}
 	defer resp.Body.Close()
+
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", fmt.Errorf("cannot read revisions body: %v", err)
 	}
+
 	var revisions Revisions
 	if err := json.Unmarshal(body, &revisions); err != nil {
 		return "", fmt.Errorf("cannot unmarshal revisions: %v", err)
 	}
+
 	latestRevision := revisions.Items[len(revisions.Items)-1]
 	return strconv.Itoa(latestRevision.Revision), nil
 }
