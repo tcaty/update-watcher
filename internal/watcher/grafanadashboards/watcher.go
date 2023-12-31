@@ -6,19 +6,37 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+
+	"github.com/tcaty/update-watcher/internal/config"
+	"github.com/tcaty/update-watcher/internal/watcher"
 )
 
 type Watcher struct {
-	baseUrl string
+	baseUrl    string
+	dashboards []string
 }
 
-func NewWatcher() *Watcher {
-	return &Watcher{baseUrl: "https://grafana.com"}
+func NewWatcher(cfg config.Grafanadasboards) *Watcher {
+	return &Watcher{
+		baseUrl:    "https://grafana.com",
+		dashboards: cfg.Dashboards,
+	}
 }
 
-func (w *Watcher) GetLastVersion() (string, error) {
-	id := 1860
-	url := w.getRevisionsUrl(id)
+func (w *Watcher) GetLatestVersions() (watcher.Versions, error) {
+	updates := make(watcher.Versions, len(w.dashboards))
+	for _, d := range w.dashboards {
+		r, err := w.getLatestRevision(d)
+		if err != nil {
+			return nil, err
+		}
+		updates[d] = r
+	}
+	return updates, nil
+}
+
+func (w *Watcher) getLatestRevision(dashboard string) (string, error) {
+	url := w.getRevisionsUrl(dashboard)
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("cannot get grafanadashboards url: %v", err)
@@ -39,6 +57,6 @@ func (w *Watcher) GetLastVersion() (string, error) {
 	return strconv.Itoa(latestRevision.Revision), nil
 }
 
-func (w *Watcher) getRevisionsUrl(id int) string {
-	return fmt.Sprintf("%s/api/dashboards/%d/revisions", w.baseUrl, id)
+func (w *Watcher) getRevisionsUrl(dashboard string) string {
+	return fmt.Sprintf("%s/api/dashboards/%s/revisions", w.baseUrl, dashboard)
 }

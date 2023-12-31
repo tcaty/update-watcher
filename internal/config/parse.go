@@ -7,21 +7,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-type Config struct {
-	Watchers struct {
-		Grafanadasboards struct {
-			Dashboards []int `yaml:"dashboards"`
-		} `yaml:"grafanadasboards"`
-		Dockerregistry struct {
-			Auth struct {
-				Login    string `yaml:"login"`
-				Password string `yaml:"password"`
-			} `yaml:"auth"`
-			Images []string `yaml:"images"`
-		} `yaml:"dockerregistry"`
-	} `yaml:"watchers"`
-}
-
 func Parse(cfgFile string) (*Config, error) {
 	var cfg *Config
 
