@@ -1,0 +1,14 @@
+# this is example configuration file
+watchers:
+  grafanadasboards:
+    dashboards:
+      - 1860
+      - 3662
+
+  dockerregistry:
+    auth:
+      login: <YOUR DOCKERHUB LOGIN HERE>
+      password: <YOUR DOCKERHUB PASSWORD HERE>
+    images:
+      - vitess/lite
+      - grafana/grafana
