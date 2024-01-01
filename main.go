@@ -19,6 +19,6 @@ func main() {
 	}
 	gdw := grafanadashboards.NewWatcher(cfg.Watchers.Grafanadasboards)
 	drw := dockerregistry.NewWatcher(cfg.Watchers.Dockerregistry)
-	watcher.Tick(gdw)
-	watcher.Tick(drw)
+	watcher.Start(gdw)
+	watcher.Start(drw)
 }

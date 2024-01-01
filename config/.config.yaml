@@ -1,11 +1,13 @@
 # this is example configuration file
 watchers:
   grafanadasboards:
+    enabled: true
     dashboards:
       - 1860
       - 3662
 
   dockerregistry:
+    enabled: true
     auth:
       login: <YOUR DOCKERHUB LOGIN HERE>
       password: <YOUR DOCKERHUB PASSWORD HERE>

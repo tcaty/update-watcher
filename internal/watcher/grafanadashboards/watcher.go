@@ -12,15 +12,26 @@ import (
 )
 
 type Watcher struct {
+	enabled    bool
 	baseUrl    string
 	dashboards []string
 }
 
 func NewWatcher(cfg config.Grafanadasboards) *Watcher {
 	return &Watcher{
+		enabled:    cfg.Enabled,
 		baseUrl:    "https://grafana.com",
 		dashboards: cfg.Dashboards,
 	}
+}
+
+func (w *Watcher) IsEnabled() bool {
+	return w.enabled
+}
+
+func (w *Watcher) Initialize() error {
+	fmt.Println("Grafanadashboards wathcher initialized.")
+	return nil
 }
 
 func (w *Watcher) GetLatestVersions() (watcher.Versions, error) {
