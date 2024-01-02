@@ -23,6 +23,7 @@ func Start(w Watcher) {
 	logger.Println("Reading configuration...")
 	if !w.IsEnabled() {
 		logger.Println("Watcher is disabled.")
+		logger.Println()
 		return
 	}
 	logger.Println("Watcher is enabled.")
