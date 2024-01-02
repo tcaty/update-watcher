@@ -9,11 +9,13 @@ type Config struct {
 
 type Grafanadasboards struct {
 	Enabled    bool     `yaml:"enabled"`
+	Name       string   `yaml:"name"`
 	Dashboards []string `yaml:"dashboards"`
 }
 
 type Dockerregistry struct {
-	Enabled bool `yaml:"enabled"`
+	Enabled bool   `yaml:"enabled"`
+	Name    string `yaml:"name"`
 	Auth    struct {
 		Login    string `yaml:"login"`
 		Password string `yaml:"password"`

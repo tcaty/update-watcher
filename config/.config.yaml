@@ -1,16 +1,32 @@
-# this is example configuration file
 watchers:
+  # -- grafanadasboards watcher configuration
   grafanadasboards:
+    # -- enable watcher
+    # default value is false
     enabled: true
+    # -- override watcher name
+    # default value grafanadasboards
+    name: grafanadashboards
+    # -- specify dashboards ids to watch for updates
     dashboards:
       - 1860
       - 3662
 
+  # -- dockerregistry watcher configuration
   dockerregistry:
+    # -- enable watcher
+    # default value is false
     enabled: true
+    # -- override watcher name
+    # default value dockerregistry
+    name: dockerregistry
+    # -- registry auth configuration
     auth:
-      login: <YOUR DOCKERHUB LOGIN HERE>
-      password: <YOUR DOCKERHUB PASSWORD HERE>
+      # -- registry username
+      username: <DOCKERHUB LOGIN>
+      # -- registry password
+      password: <DOCKERHUB PASSWORD>
+    # -- specify images to watch for updates
     images:
       - vitess/lite
       - grafana/grafana

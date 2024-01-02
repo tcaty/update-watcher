@@ -24,10 +24,16 @@ func Parse(cfgFile string) (*Config, error) {
 	}
 
 	viper.AutomaticEnv()
+
+	viper.SetDefault("watchers.grafanadasboards.name", "grafanadasboards")
+	viper.SetDefault("watchers.dockerregistry.name", "dockerregistry")
+	viper.SetDefault("watchers.dockerregistry.enabled", false)
+	viper.SetDefault("watchers.grafanadasboards.name", false)
+
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("error occured during reading config file: %v", err)
 	}
-	fmt.Println("Using config file:", viper.ConfigFileUsed())
+	fmt.Printf("Using config file: %s\n\n", viper.ConfigFileUsed())
 
 	err := viper.Unmarshal(&cfg)
 	return cfg, err

@@ -13,6 +13,7 @@ import (
 
 type Watcher struct {
 	enabled    bool
+	name       string
 	baseUrl    string
 	dashboards []string
 }
@@ -20,6 +21,7 @@ type Watcher struct {
 func NewWatcher(cfg config.Grafanadasboards) *Watcher {
 	return &Watcher{
 		enabled:    cfg.Enabled,
+		name:       cfg.Name,
 		baseUrl:    "https://grafana.com",
 		dashboards: cfg.Dashboards,
 	}
@@ -29,8 +31,11 @@ func (w *Watcher) IsEnabled() bool {
 	return w.enabled
 }
 
+func (w *Watcher) GetName() string {
+	return w.name
+}
+
 func (w *Watcher) Initialize() error {
-	fmt.Println("Grafanadashboards wathcher initialized.")
 	return nil
 }
 
