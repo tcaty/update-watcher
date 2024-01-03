@@ -17,8 +17,13 @@ func main() {
 		fmt.Printf("could not parse config: %v", err)
 		return
 	}
+
 	gdw := grafanadashboards.NewWatcher(cfg.Watchers.Grafanadasboards)
 	drw := dockerregistry.NewWatcher(cfg.Watchers.Dockerregistry)
-	watcher.Start(gdw)
-	watcher.Start(drw)
+
+	watcher.Initialize[*grafanadashboards.Revisions](gdw)
+	watcher.Initialize[*dockerregistry.Tags](drw)
+
+	watcher.Tick[*grafanadashboards.Revisions](gdw)
+	watcher.Tick[*dockerregistry.Tags](drw)
 }

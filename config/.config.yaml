@@ -20,12 +20,6 @@ watchers:
     # -- override watcher name
     # default value dockerregistry
     name: dockerregistry
-    # -- registry auth configuration
-    auth:
-      # -- registry username
-      username: <DOCKERHUB LOGIN>
-      # -- registry password
-      password: <DOCKERHUB PASSWORD>
     # -- specify images to watch for updates
     images:
       - vitess/lite

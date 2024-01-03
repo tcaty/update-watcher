@@ -14,11 +14,7 @@ type Grafanadasboards struct {
 }
 
 type Dockerregistry struct {
-	Enabled bool   `yaml:"enabled"`
-	Name    string `yaml:"name"`
-	Auth    struct {
-		Login    string `yaml:"login"`
-		Password string `yaml:"password"`
-	} `yaml:"auth"`
-	Images []string `yaml:"images"`
+	Enabled bool     `yaml:"enabled"`
+	Name    string   `yaml:"name"`
+	Images  []string `yaml:"images"`
 }
