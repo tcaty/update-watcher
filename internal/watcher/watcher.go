@@ -31,7 +31,7 @@ func Initialize[T comparable](w Watcher[T]) {
 		return
 	}
 
-	// TODO:
+	// TODO: implement auth logic here
 
 	logger.Println("Watcher is enabled.")
 	logger.Println("Watcher has been initialized successfully!")
