@@ -20,9 +20,9 @@ func main() {
 		os.Exit(1)
 	}
 
-	repo, err := repository.New(cfg.Postgresql)
+	repo, err := initRepo(cfg.Postgresql)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "unable to connect to database: %v\n", err)
+		fmt.Fprintf(os.Stderr, "could not initialize repo: %v", err)
 		os.Exit(1)
 	}
 	defer repo.Close()
@@ -30,6 +30,20 @@ func main() {
 	if false {
 		startWatchers(cfg.Watchers)
 	}
+}
+
+func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
+	repo, err := repository.New(cfg)
+	if err != nil {
+		return nil, fmt.Errorf("unable to connect to database: %v", err)
+	}
+	if err := repo.Ping(); err != nil {
+		return nil, fmt.Errorf("unable to ping database: %v", err)
+	}
+	if err := repo.InitializeTables(); err != nil {
+		return nil, fmt.Errorf("unable to initialize database tables: %v", err)
+	}
+	return repo, nil
 }
 
 func startWatchers(cfg config.Watchers) {

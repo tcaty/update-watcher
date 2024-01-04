@@ -21,13 +21,23 @@ func New(cfg config.Postgresql) (*Repository, error) {
 		cfg.Port,
 		cfg.Database,
 	)
-	fmt.Printf("Connecting to database %s ...\n", connString)
+	fmt.Printf("Using connection string: %s\n", connString)
+	fmt.Println("Connecting to database...")
 	conn, err := pgx.Connect(context.Background(), connString)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Printf("Connection to database %s completed successfully!\n", connString)
+	fmt.Println("Connection to database completed successfully!")
 	return &Repository{conn: conn}, nil
+}
+
+func (r *Repository) InitializeTables() error {
+	_, err := r.conn.Exec(context.Background(), createVersionsTableQuery)
+	return err
+}
+
+func (r *Repository) Ping() error {
+	return r.conn.Ping(context.Background())
 }
 
 func (r *Repository) Close() {
