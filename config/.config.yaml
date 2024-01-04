@@ -24,3 +24,19 @@ watchers:
     images:
       - vitess/lite
       - grafana/grafana
+        
+
+postgresql:
+  # -- postgresql database name
+  # should match with POSTGRES_DB in docker-compose.dev.yaml
+  database: update-watcher
+  # -- postgresql user
+  # should match with POSTGRES_USER in docker-compose.dev.yaml
+  user: update-watcher
+  # -- postgresql password
+  # should match with POSTGRES_PASSWORD in docker-compose.dev.yaml
+  password: changeme
+  # -- postgresql host
+  host: 0.0.0.0
+  # -- postgresql port
+  port: 5432
