@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/jackc/pgx/v5"
@@ -34,6 +35,44 @@ func New(cfg config.Postgresql) (*Repository, error) {
 func (r *Repository) InitializeTables() error {
 	_, err := r.conn.Exec(context.Background(), createVersionsTableQuery)
 	return err
+}
+
+func (r *Repository) DoesVersionRecordExist(target string) (bool, error) {
+	var id int
+	row := r.conn.QueryRow(context.Background(), selectIdByTargetQuery, target)
+	err := row.Scan(&id)
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return false, err
+	}
+	return id > 0, nil
+}
+
+func (r *Repository) InsertVersionRecord(target string, version string) error {
+	row := r.conn.QueryRow(context.Background(), insertVersionRecords, target, version)
+	err := row.Scan()
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return fmt.Errorf("could not insert version record: %v", err)
+	}
+	return nil
+}
+
+func (r *Repository) DoesVersionRecordNeedUpdate(target string, newVersion string) (bool, error) {
+	var version string
+	row := r.conn.QueryRow(context.Background(), selectVersionByTargetQuery, target)
+	err := row.Scan(&version)
+	if err != nil {
+		return false, fmt.Errorf("unable to check version record update status: %v", err)
+	}
+	return version != newVersion, nil
+}
+
+func (r *Repository) UpdateVersionRecord(target string, newVersion string) error {
+	row := r.conn.QueryRow(context.Background(), updateVersionRecordVersionByTarget, newVersion, target)
+	err := row.Scan()
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return fmt.Errorf("could not update version record: %v", err)
+	}
+	return nil
 }
 
 func (r *Repository) Ping() error {

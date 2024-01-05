@@ -7,12 +7,14 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/tcaty/update-watcher/internal/repository"
 )
 
-// map target identifire to it's latest version
+// map target to it's latest version
 // grafanadashboards: {"1860": "31"}
 // dockerregistry: {"grafana/dashboard": "10.7.4"}
-type Versions = map[string]string
+type VersionRecords = map[string]string
 type Watcher[T comparable] interface {
 	IsEnabled() bool
 	GetName() string
@@ -27,7 +29,6 @@ func Initialize[T comparable](w Watcher[T]) {
 	logger.Println("Reading configuration...")
 	if !w.IsEnabled() {
 		logger.Println("Watcher is disabled.")
-		logger.Println()
 		return
 	}
 
@@ -37,18 +38,50 @@ func Initialize[T comparable](w Watcher[T]) {
 	logger.Println("Watcher has been initialized successfully!")
 }
 
-func Tick[T comparable](w Watcher[T]) error {
+func Tick[T comparable](w Watcher[T], r *repository.Repository) {
 	targets := w.GetTargets()
 	versions, err := getLatestVersions[T](w, targets)
 	if err != nil {
-		return err
+		return
 	}
-	fmt.Println(versions)
-	return nil
+	for target, version := range versions {
+		updated, err := updateVersionRecord(target, version, r)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "err: %v", err)
+		}
+		if updated {
+			fmt.Printf("updated %s -> %s\n", target, version)
+		}
+	}
 }
 
-func getLatestVersions[T comparable](w Watcher[T], targets []string) (Versions, error) {
-	versions := make(Versions, len(targets))
+func updateVersionRecord(target string, version string, r *repository.Repository) (bool, error) {
+	doesVersionRecordExist, err := r.DoesVersionRecordExist(target)
+	if err != nil {
+		return false, fmt.Errorf("update version record err: %v", err)
+	}
+	if doesVersionRecordExist {
+		doesVersionRecordNeedUpdate, err := r.DoesVersionRecordNeedUpdate(target, version)
+		if err != nil {
+			return false, fmt.Errorf("update version record err: %v", err)
+		}
+		if doesVersionRecordNeedUpdate {
+			err = r.UpdateVersionRecord(target, version)
+			if err != nil {
+				return false, fmt.Errorf("update version record err: %v", err)
+			}
+			return true, nil
+		}
+	} else {
+		if err := r.InsertVersionRecord(target, version); err != nil {
+			return false, fmt.Errorf("update version record err: %v", err)
+		}
+	}
+	return false, nil
+}
+
+func getLatestVersions[T comparable](w Watcher[T], targets []string) (VersionRecords, error) {
+	versionRecords := make(VersionRecords, len(targets))
 
 	for _, t := range targets {
 		url, err := w.CreateUrl(t)
@@ -61,10 +94,10 @@ func getLatestVersions[T comparable](w Watcher[T], targets []string) (Versions, 
 			return nil, err
 		}
 
-		versions[t] = r
+		versionRecords[t] = r
 	}
 
-	return versions, nil
+	return versionRecords, nil
 }
 
 func getLatestVersion[T comparable](w Watcher[T], url string) (string, error) {

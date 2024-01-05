@@ -27,9 +27,7 @@ func main() {
 	}
 	defer repo.Close()
 
-	if false {
-		startWatchers(cfg.Watchers)
-	}
+	startWatchers(cfg.Watchers, repo)
 }
 
 func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
@@ -46,13 +44,13 @@ func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
 	return repo, nil
 }
 
-func startWatchers(cfg config.Watchers) {
+func startWatchers(cfg config.Watchers, repo *repository.Repository) {
 	gdw := grafanadashboards.NewWatcher(cfg.Grafanadasboards)
 	drw := dockerregistry.NewWatcher(cfg.Dockerregistry)
 
 	watcher.Initialize[*grafanadashboards.Revisions](gdw)
 	watcher.Initialize[*dockerregistry.Tags](drw)
 
-	watcher.Tick[*grafanadashboards.Revisions](gdw)
-	watcher.Tick[*dockerregistry.Tags](drw)
+	watcher.Tick[*grafanadashboards.Revisions](gdw, repo)
+	watcher.Tick[*dockerregistry.Tags](drw, repo)
 }
