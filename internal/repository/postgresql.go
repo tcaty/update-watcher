@@ -32,6 +32,10 @@ func New(cfg config.Postgresql) (*Repository, error) {
 	return &Repository{conn: conn}, nil
 }
 
+func (r *Repository) Ping() error {
+	return r.conn.Ping(context.Background())
+}
+
 func (r *Repository) InitializeTables() error {
 	_, err := r.conn.Exec(context.Background(), createVersionsTableQuery)
 	return err
@@ -60,6 +64,10 @@ func (r *Repository) UpdateVersionRecord(target string, version string) (bool, e
 		}
 	}
 	return false, nil
+}
+
+func (r *Repository) Close() {
+	r.conn.Close(context.Background())
 }
 
 func (r *Repository) doesVersionRecordExist(target string) (bool, error) {
@@ -98,12 +106,4 @@ func (r *Repository) setVersion(target string, newVersion string) error {
 		return fmt.Errorf("could not update version record: %v", err)
 	}
 	return nil
-}
-
-func (r *Repository) Ping() error {
-	return r.conn.Ping(context.Background())
-}
-
-func (r *Repository) Close() {
-	r.conn.Close(context.Background())
 }
