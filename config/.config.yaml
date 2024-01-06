@@ -40,3 +40,24 @@ postgresql:
   host: 0.0.0.0
   # -- postgresql port
   port: 5432
+  
+    
+webhooks:
+  # -- discord webhook configuration
+  discord:
+    # -- enable webhook
+    # default value is false
+    enabled: true
+    # -- secret webhook url
+    url: "<webhook url>"
+    # -- embed message avatar url
+    avatar: "<image url>"
+    # -- embed message author
+    author: update-watcher
+    
+  # -- slack webhook configuration
+  # TODO: implement this webhook
+  slack: 
+    # -- enable webhook
+    # default value is false
+    enabled: false

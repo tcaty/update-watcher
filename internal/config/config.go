@@ -1,31 +1,48 @@
 package config
 
+import (
+	"fmt"
+	"os"
+
+	"github.com/spf13/viper"
+)
+
 type Config struct {
 	Watchers   Watchers   `yaml:"watchers"`
 	Postgresql Postgresql `yaml:"postgresql"`
+	Webhooks   Webhooks   `yaml:"webhooks"`
 }
 
-type Watchers struct {
-	Grafanadasboards Grafanadasboards `yaml:"grafanadasboards"`
-	Dockerregistry   Dockerregistry   `yaml:"dockerregistry"`
-}
+func Parse(cfgFile string) (*Config, error) {
+	var cfg *Config
 
-type Grafanadasboards struct {
-	Enabled    bool     `yaml:"enabled"`
-	Name       string   `yaml:"name"`
-	Dashboards []string `yaml:"dashboards"`
-}
+	if cfgFile != "" {
+		viper.SetConfigFile(cfgFile)
+	} else {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return nil, fmt.Errorf("can't get user home dir: %v", err)
+		}
 
-type Dockerregistry struct {
-	Enabled bool     `yaml:"enabled"`
-	Name    string   `yaml:"name"`
-	Images  []string `yaml:"images"`
-}
+		viper.AddConfigPath(home)
+		viper.SetConfigType("yaml")
+		viper.SetConfigName("config")
+	}
 
-type Postgresql struct {
-	Database string `yaml:"database"`
-	User     string `yaml:"user"`
-	Password string `yaml:"password"`
-	Host     string `yaml:"host"`
-	Port     int    `yaml:"port"`
+	viper.AutomaticEnv()
+
+	viper.SetDefault("watchers.grafanadasboards.name", "grafanadasboards")
+	viper.SetDefault("watchers.dockerregistry.name", "dockerregistry")
+	viper.SetDefault("watchers.dockerregistry.enabled", false)
+	viper.SetDefault("watchers.grafanadasboards.name", false)
+	viper.SetDefault("webhooks.discord.enabled", false)
+	viper.SetDefault("webhooks.slack.enabled", false)
+
+	if err := viper.ReadInConfig(); err != nil {
+		return nil, fmt.Errorf("error occured during reading config file: %v", err)
+	}
+	fmt.Printf("Using config file: %s\n\n", viper.ConfigFileUsed())
+
+	err := viper.Unmarshal(&cfg)
+	return cfg, err
 }
