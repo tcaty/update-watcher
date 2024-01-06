@@ -78,18 +78,18 @@ func getLatestVersions[T comparable](w Watcher[T], targets []string) (VersionRec
 func getLatestVersion[T comparable](w Watcher[T], url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", fmt.Errorf("cannot get grafanadashboards url: %v", err)
+		return "", fmt.Errorf("cannot get url: %v", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("cannot read revisions body: %v", err)
+		return "", fmt.Errorf("cannot read body: %v", err)
 	}
 
 	var versions T
 	if err := json.Unmarshal(body, &versions); err != nil {
-		return "", fmt.Errorf("cannot unmarshal revisions: %v", err)
+		return "", fmt.Errorf("cannot unmarshal json: %v", err)
 	}
 
 	latestVersion := w.GetLatestVersion(versions)

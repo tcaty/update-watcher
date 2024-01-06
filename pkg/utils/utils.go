@@ -3,6 +3,8 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"os"
 )
 
 func CreateHttpRequestPayload(v any) (*bytes.Buffer, error) {
@@ -12,4 +14,11 @@ func CreateHttpRequestPayload(v any) (*bytes.Buffer, error) {
 		return nil, err
 	}
 	return payload, nil
+}
+
+func HandleFatal(message string, err error) {
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s: %v", message, err)
+		os.Exit(1)
+	}
 }

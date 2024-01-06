@@ -44,7 +44,8 @@ func (w *Watcher) CreateUrl(image string) (string, error) {
 		return "", errors.New("docker image should fit the format {namespace}/{repository}")
 	}
 	ns, repo := string(b[:i]), string(b[i+1:])
-	return fmt.Sprintf("%s/namespaces/%s/repositories/%s/tags", w.baseUrl, ns, repo), nil
+	url := fmt.Sprintf("%s/namespaces/%s/repositories/%s/tags", w.baseUrl, ns, repo)
+	return url, nil
 }
 
 func (w *Watcher) GetLatestVersion(tags *Tags) string {
