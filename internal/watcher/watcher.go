@@ -45,7 +45,7 @@ func Tick[T comparable](w Watcher[T], r *repository.Repository) {
 		return
 	}
 	for target, version := range versions {
-		updated, err := updateVersionRecord(target, version, r)
+		updated, err := r.UpdateVersionRecord(target, version)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "err: %v", err)
 		}
@@ -53,31 +53,6 @@ func Tick[T comparable](w Watcher[T], r *repository.Repository) {
 			fmt.Printf("updated %s -> %s\n", target, version)
 		}
 	}
-}
-
-func updateVersionRecord(target string, version string, r *repository.Repository) (bool, error) {
-	doesVersionRecordExist, err := r.DoesVersionRecordExist(target)
-	if err != nil {
-		return false, fmt.Errorf("update version record err: %v", err)
-	}
-	if doesVersionRecordExist {
-		doesVersionRecordNeedUpdate, err := r.DoesVersionRecordNeedUpdate(target, version)
-		if err != nil {
-			return false, fmt.Errorf("update version record err: %v", err)
-		}
-		if doesVersionRecordNeedUpdate {
-			err = r.UpdateVersionRecord(target, version)
-			if err != nil {
-				return false, fmt.Errorf("update version record err: %v", err)
-			}
-			return true, nil
-		}
-	} else {
-		if err := r.InsertVersionRecord(target, version); err != nil {
-			return false, fmt.Errorf("update version record err: %v", err)
-		}
-	}
-	return false, nil
 }
 
 func getLatestVersions[T comparable](w Watcher[T], targets []string) (VersionRecords, error) {

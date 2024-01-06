@@ -14,10 +14,10 @@ const (
 	selectVersionByTargetQuery = `
 		SELECT version FROM versionRecords WHERE target = $1
 	`
-	insertVersionRecords = `
+	insertVersionRecordsQuery = `
 		INSERT INTO versionRecords (target, version) VALUES ($1, $2)
 	`
-	updateVersionRecordVersionByTarget = `
+	setVersionByTargetQuery = `
 		UPDATE versionRecords
 		SET version = $1
 		WHERE target = $2

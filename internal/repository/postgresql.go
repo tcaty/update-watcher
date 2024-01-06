@@ -37,7 +37,32 @@ func (r *Repository) InitializeTables() error {
 	return err
 }
 
-func (r *Repository) DoesVersionRecordExist(target string) (bool, error) {
+func (r *Repository) UpdateVersionRecord(target string, version string) (bool, error) {
+	doesVersionRecordExist, err := r.doesVersionRecordExist(target)
+	if err != nil {
+		return false, fmt.Errorf("update version record err: %v", err)
+	}
+	if doesVersionRecordExist {
+		doesVersionRecordNeedUpdate, err := r.doesVersionRecordNeedUpdate(target, version)
+		if err != nil {
+			return false, fmt.Errorf("update version record err: %v", err)
+		}
+		if doesVersionRecordNeedUpdate {
+			err = r.setVersion(target, version)
+			if err != nil {
+				return false, fmt.Errorf("update version record err: %v", err)
+			}
+			return true, nil
+		}
+	} else {
+		if err := r.insertVersionRecord(target, version); err != nil {
+			return false, fmt.Errorf("update version record err: %v", err)
+		}
+	}
+	return false, nil
+}
+
+func (r *Repository) doesVersionRecordExist(target string) (bool, error) {
 	var id int
 	row := r.conn.QueryRow(context.Background(), selectIdByTargetQuery, target)
 	err := row.Scan(&id)
@@ -47,8 +72,8 @@ func (r *Repository) DoesVersionRecordExist(target string) (bool, error) {
 	return id > 0, nil
 }
 
-func (r *Repository) InsertVersionRecord(target string, version string) error {
-	row := r.conn.QueryRow(context.Background(), insertVersionRecords, target, version)
+func (r *Repository) insertVersionRecord(target string, version string) error {
+	row := r.conn.QueryRow(context.Background(), insertVersionRecordsQuery, target, version)
 	err := row.Scan()
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return fmt.Errorf("could not insert version record: %v", err)
@@ -56,7 +81,7 @@ func (r *Repository) InsertVersionRecord(target string, version string) error {
 	return nil
 }
 
-func (r *Repository) DoesVersionRecordNeedUpdate(target string, newVersion string) (bool, error) {
+func (r *Repository) doesVersionRecordNeedUpdate(target string, newVersion string) (bool, error) {
 	var version string
 	row := r.conn.QueryRow(context.Background(), selectVersionByTargetQuery, target)
 	err := row.Scan(&version)
@@ -66,8 +91,8 @@ func (r *Repository) DoesVersionRecordNeedUpdate(target string, newVersion strin
 	return version != newVersion, nil
 }
 
-func (r *Repository) UpdateVersionRecord(target string, newVersion string) error {
-	row := r.conn.QueryRow(context.Background(), updateVersionRecordVersionByTarget, newVersion, target)
+func (r *Repository) setVersion(target string, newVersion string) error {
+	row := r.conn.QueryRow(context.Background(), setVersionByTargetQuery, newVersion, target)
 	err := row.Scan()
 	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
 		return fmt.Errorf("could not update version record: %v", err)
