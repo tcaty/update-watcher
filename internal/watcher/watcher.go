@@ -1,61 +1,44 @@
 package watcher
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
-
-	"github.com/tcaty/update-watcher/internal/repository"
 )
 
 // map target to it's latest version
 // grafanadashboards: {"1860": "31"}
 // dockerregistry: {"grafana/dashboard": "10.7.4"}
 type VersionRecords = map[string]string
-type Watcher[T comparable] interface {
+type Watcher interface {
 	IsEnabled() bool
 	GetName() string
 	CreateUrl(target string) (string, error)
 	GetTargets() []string
-	GetLatestVersion(versions T) string
+	GetLatestVersion(data []byte) (string, error)
 }
 
-func Initialize[T comparable](w Watcher[T]) {
+func Initialize(w Watcher) error {
 	logger := log.New(os.Stdout, fmt.Sprintf("[%s] ", w.GetName()), log.Ldate|log.Ltime)
 
 	logger.Println("Reading configuration...")
 	if !w.IsEnabled() {
 		logger.Println("Watcher is disabled.")
-		return
+		return nil
 	}
 
 	// TODO: implement auth logic here
+	// somewhere here return error
 
 	logger.Println("Watcher is enabled.")
 	logger.Println("Watcher has been initialized successfully!")
+
+	return nil
 }
 
-func Tick[T comparable](w Watcher[T], r *repository.Repository) {
-	targets := w.GetTargets()
-	versions, err := getLatestVersions[T](w, targets)
-	if err != nil {
-		return
-	}
-	for target, version := range versions {
-		updated, err := r.UpdateVersionRecord(target, version)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "err: %v", err)
-		}
-		if updated {
-			fmt.Printf("updated %s -> %s\n", target, version)
-		}
-	}
-}
-
-func getLatestVersions[T comparable](w Watcher[T], targets []string) (VersionRecords, error) {
+func GetLatestVersions(w Watcher, targets []string) (VersionRecords, error) {
 	versionRecords := make(VersionRecords, len(targets))
 
 	for _, t := range targets {
@@ -64,7 +47,7 @@ func getLatestVersions[T comparable](w Watcher[T], targets []string) (VersionRec
 			return nil, fmt.Errorf("cannot create url: %v", err)
 		}
 
-		r, err := getLatestVersion[T](w, url)
+		r, err := getLatestVersion(w, url)
 		if err != nil {
 			return nil, err
 		}
@@ -75,7 +58,7 @@ func getLatestVersions[T comparable](w Watcher[T], targets []string) (VersionRec
 	return versionRecords, nil
 }
 
-func getLatestVersion[T comparable](w Watcher[T], url string) (string, error) {
+func getLatestVersion(w Watcher, url string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("cannot get url: %v", err)
@@ -87,11 +70,10 @@ func getLatestVersion[T comparable](w Watcher[T], url string) (string, error) {
 		return "", fmt.Errorf("cannot read body: %v", err)
 	}
 
-	var versions T
-	if err := json.Unmarshal(body, &versions); err != nil {
-		return "", fmt.Errorf("cannot unmarshal json: %v", err)
+	latestVersion, err := w.GetLatestVersion(body)
+	if err != nil {
+		return "", fmt.Errorf("cannot get latest version: %v", err)
 	}
 
-	latestVersion := w.GetLatestVersion(versions)
 	return latestVersion, nil
 }

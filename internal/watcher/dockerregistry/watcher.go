@@ -2,6 +2,7 @@ package dockerregistry
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -40,21 +41,31 @@ func (w *Watcher) GetTargets() []string {
 func (w *Watcher) CreateUrl(image string) (string, error) {
 	b := []byte(image)
 	i := bytes.IndexByte(b, byte('/'))
+
 	if i < 0 {
 		return "", errors.New("docker image should fit the format {namespace}/{repository}")
 	}
+
 	ns, repo := string(b[:i]), string(b[i+1:])
 	url := fmt.Sprintf("%s/namespaces/%s/repositories/%s/tags", w.baseUrl, ns, repo)
+
 	return url, nil
 }
 
-func (w *Watcher) GetLatestVersion(tags *Tags) string {
+func (w *Watcher) GetLatestVersion(data []byte) (string, error) {
+	var tags Tags
+
+	if err := json.Unmarshal(data, &tags); err != nil {
+		return "", fmt.Errorf("cannot unmarshal json: %v", err)
+	}
+
 	for _, t := range tags.Results {
 		name := t.Name
 		if name != "latest" {
-			return name
+			return name, nil
 		}
 	}
+
 	// if there are no tags except latest, only then return it
-	return "latest"
+	return "latest", nil
 }

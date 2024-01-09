@@ -1,6 +1,7 @@
 package grafanadashboards
 
 import (
+	"encoding/json"
 	"fmt"
 	"strconv"
 
@@ -39,7 +40,13 @@ func (w *Watcher) CreateUrl(dashboard string) (string, error) {
 	return fmt.Sprintf("%s/api/dashboards/%s/revisions", w.baseUrl, dashboard), nil
 }
 
-func (w *Watcher) GetLatestVersion(revisions *Revisions) string {
+func (w *Watcher) GetLatestVersion(data []byte) (string, error) {
+	var revisions Revisions
+
+	if err := json.Unmarshal(data, &revisions); err != nil {
+		return "", fmt.Errorf("cannot unmarshal json: %v", err)
+	}
+
 	latest := revisions.Items[len(revisions.Items)-1]
-	return strconv.Itoa(latest.Revision)
+	return strconv.Itoa(latest.Revision), nil
 }
