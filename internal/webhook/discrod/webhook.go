@@ -10,6 +10,7 @@ import (
 
 type Discord struct {
 	enabled bool
+	name    string
 	url     string
 	avatar  string
 	author  string
@@ -18,6 +19,7 @@ type Discord struct {
 func NewWebhook(cfg config.Discord) *Discord {
 	return &Discord{
 		enabled: cfg.Enabled,
+		name:    cfg.Name,
 		url:     cfg.Url,
 		avatar:  cfg.Avatar,
 		author:  cfg.Author,
@@ -26,6 +28,10 @@ func NewWebhook(cfg config.Discord) *Discord {
 
 func (w *Discord) IsEnabled() bool {
 	return w.enabled
+}
+
+func (w *Discord) GetName() string {
+	return w.name
 }
 
 func (w *Discord) GetUrl() string {

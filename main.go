@@ -78,7 +78,7 @@ func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
 	}
 	for _, w := range webhooks {
 		if err := webhook.Ping(w); err != nil {
-			return nil, fmt.Errorf("could not ping webhook: %v", err)
+			return nil, fmt.Errorf("could not ping webhook %s: %v", w.GetName(), err)
 		}
 	}
 	return webhooks, nil

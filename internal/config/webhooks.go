@@ -7,11 +7,13 @@ type Webhooks struct {
 
 type Discord struct {
 	Enabled bool   `yaml:"enabled"`
+	Name    string `yaml:"name"`
 	Url     string `yaml:"url"`
 	Avatar  string `yaml:"avatar"`
 	Author  string `yaml:"author"`
 }
 
 type Slack struct {
-	Enabled bool `yaml:"enabled"`
+	Enabled bool   `yaml:"enabled"`
+	Name    string `yaml:"name"`
 }

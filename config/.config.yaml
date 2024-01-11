@@ -48,6 +48,9 @@ webhooks:
     # -- enable webhook
     # default value is false
     enabled: true
+    # -- override webhook name
+    # default value is discord
+    name: discord
     # -- secret webhook url
     url: "<webhook url>"
     # -- embed message avatar url
@@ -61,3 +64,6 @@ webhooks:
     # -- enable webhook
     # default value is false
     enabled: false
+    # -- override webhook name
+    # default value is slack
+    name: slack

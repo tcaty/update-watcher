@@ -11,6 +11,7 @@ import (
 
 type Webhook interface {
 	IsEnabled() bool
+	GetName() string
 	GetUrl() string
 	CreatePayload(target string, version string) (*bytes.Buffer, error)
 }
