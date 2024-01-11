@@ -2,20 +2,19 @@ package core
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/tcaty/update-watcher/internal/repository"
 	"github.com/tcaty/update-watcher/internal/watcher"
 	"github.com/tcaty/update-watcher/internal/webhook"
 )
 
-func Task(wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) error {
+func Task(wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) {
 	for _, wt := range wts {
 		if err := task(wt, whs, r); err != nil {
-			return fmt.Errorf("could not tick: %v", err)
+			fmt.Fprintf(os.Stderr, "could not tick: %v", err)
 		}
 	}
-
-	return nil
 }
 
 func task(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) error {
@@ -32,9 +31,12 @@ func task(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) e
 		if err != nil {
 			return fmt.Errorf("could not update version record: %v", err)
 		}
+		// TODO: remove ! sign
 		if updated {
-			if err := webhook.NotifyAll(whs, target, version); err != nil {
-				return fmt.Errorf("could not notify all: %v", err)
+			for _, wh := range whs {
+				if err := webhook.Notify(wh, target, version); err != nil {
+					return fmt.Errorf("could not notify: %v", err)
+				}
 			}
 		}
 	}

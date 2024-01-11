@@ -2,6 +2,7 @@ package discrod
 
 import (
 	"bytes"
+	"fmt"
 
 	"github.com/tcaty/update-watcher/internal/config"
 	"github.com/tcaty/update-watcher/pkg/utils"
@@ -32,16 +33,18 @@ func (w *Discord) GetUrl() string {
 }
 
 func (w *Discord) CreatePayload(target string, version string) (*bytes.Buffer, error) {
-	image := Image{
-		Url: "",
+	author := Author{
+		Name:    "Update watcher",
+		IconUrl: "https://cdn-icons-png.flaticon.com/512/1472/1472457.png",
 	}
 	embed := Embed{
-		Image: &image,
+		Author:      author,
+		Title:       "New version detected",
+		Description: fmt.Sprintf("New version here! %s:%s", target, version),
+		Color:       "242424",
 	}
 	message := Message{
-		Username: "",
-		Content:  "",
-		Embeds:   &[]Embed{embed},
+		Embeds: []Embed{embed},
 	}
 	payload, err := utils.CreateHttpRequestPayload(message)
 	if err != nil {

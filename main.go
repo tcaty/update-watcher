@@ -32,7 +32,8 @@ func main() {
 	wts, err := initWatchers(cfg.Watchers)
 	utils.HandleFatal("could not initialize watchers", err)
 
-	whs := initWebhooks(cfg.Webhooks)
+	whs, err := initWebhooks(cfg.Webhooks)
+	utils.HandleFatal("could not initialize webhooks", err)
 
 	s, err := initScheduler(wts, whs, repo)
 	utils.HandleFatal("could not initialize scheduler", err)
@@ -71,11 +72,16 @@ func initWatchers(cfg config.Watchers) ([]watcher.Watcher, error) {
 	return watchers, nil
 }
 
-func initWebhooks(cfg config.Webhooks) []webhook.Webhook {
+func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
 	webhooks := []webhook.Webhook{
 		discrod.NewWebhook(cfg.Discord),
 	}
-	return webhooks
+	for _, w := range webhooks {
+		if err := webhook.Ping(w); err != nil {
+			return nil, fmt.Errorf("could not ping webhook: %v", err)
+		}
+	}
+	return webhooks, nil
 }
 
 func initScheduler(wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) (gocron.Scheduler, error) {

@@ -1,23 +1,23 @@
 package discrod
 
 type Message struct {
-	Username        string           `json:"username,omitempty"`
-	AvatarUrl       string           `json:"avatar_url,omitempty"`
-	Content         string           `json:"content,omitempty"`
-	Embeds          *[]Embed         `json:"embeds,omitempty"`
-	AllowedMentions *AllowedMentions `json:"allowed_mentions,omitempty"`
+	Username        string          `json:"username,omitempty"`
+	AvatarUrl       string          `json:"avatar_url,omitempty"`
+	Content         string          `json:"content,omitempty"`
+	Embeds          []Embed         `json:"embeds,omitempty"`
+	AllowedMentions AllowedMentions `json:"allowed_mentions,omitempty"`
 }
 
 type Embed struct {
-	Title       string     `json:"title,omitempty"`
-	Url         string     `json:"url,omitempty"`
-	Description string     `json:"description,omitempty"`
-	Color       string     `json:"color,omitempty"`
-	Author      *Author    `json:"author,omitempty"`
-	Fields      *[]Field   `json:"fields,omitempty"`
-	Thumbnail   *Thumbnail `json:"thumbnail,omitempty"`
-	Image       *Image     `json:"image,omitempty"`
-	Footer      *Footer    `json:"footer,omitempty"`
+	Title       string    `json:"title,omitempty"`
+	Url         string    `json:"url,omitempty"`
+	Description string    `json:"description,omitempty"`
+	Color       string    `json:"color,omitempty"`
+	Author      Author    `json:"author,omitempty"`
+	Fields      []Field   `json:"fields,omitempty"`
+	Thumbnail   Thumbnail `json:"thumbnail,omitempty"`
+	Image       Image     `json:"image,omitempty"`
+	Footer      Footer    `json:"footer,omitempty"`
 }
 
 type Author struct {
@@ -46,7 +46,7 @@ type Footer struct {
 }
 
 type AllowedMentions struct {
-	Parse *[]string `json:"parse,omitempty"`
-	Users *[]string `json:"users,omitempty"`
-	Roles *[]string `json:"roles,omitempty"`
+	Parse []string `json:"parse,omitempty"`
+	Users []string `json:"users,omitempty"`
+	Roles []string `json:"roles,omitempty"`
 }
