@@ -11,6 +11,7 @@ type Discord struct {
 	Url     string `yaml:"url"`
 	Avatar  string `yaml:"avatar"`
 	Author  string `yaml:"author"`
+	Color   int    `yaml:"color"`
 }
 
 type Slack struct {

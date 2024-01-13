@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/tcaty/update-watcher/pkg/markdown"
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
@@ -13,16 +14,17 @@ type Webhook interface {
 	IsEnabled() bool
 	GetName() string
 	GetUrl() string
-	CreatePayload(target string, version string) (*bytes.Buffer, error)
+	CreatePayload(title string, description string) (*bytes.Buffer, error)
 }
 
-func Notify(w Webhook, target string, version string) error {
-	url := w.GetUrl()
-	payload, err := w.CreatePayload(target, version)
+func Notify(wh Webhook, title string, href *markdown.Href) error {
+	description := fmt.Sprintf("New version released! Checkout %s", href.Get())
+	payload, err := wh.CreatePayload(title, description)
 	if err != nil {
 		return fmt.Errorf("could not create http request empty payload: %v", err)
 	}
 
+	url := wh.GetUrl()
 	resp, err := http.Post(url, "application/json", payload)
 	if err != nil {
 		return fmt.Errorf("http post request err: %v", err)

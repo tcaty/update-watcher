@@ -7,6 +7,7 @@ import (
 	"github.com/tcaty/update-watcher/internal/repository"
 	"github.com/tcaty/update-watcher/internal/watcher"
 	"github.com/tcaty/update-watcher/internal/webhook"
+	"github.com/tcaty/update-watcher/pkg/markdown"
 )
 
 func Task(wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) {
@@ -32,9 +33,13 @@ func task(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) e
 			return fmt.Errorf("could not update version record: %v", err)
 		}
 		// TODO: remove ! sign
-		if updated {
+		if !updated {
 			for _, wh := range whs {
-				if err := webhook.Notify(wh, target, version); err != nil {
+				title := wt.GetName()
+				// TODO: add CreateVersionsUrl to Watcher
+				// TODO: add GetTargetName to Watcher
+				href := markdown.NewHref("text", "https://hub.docker.com/r/grafana/grafana/tags")
+				if err := webhook.Notify(wh, title, href); err != nil {
 					return fmt.Errorf("could not notify: %v", err)
 				}
 			}

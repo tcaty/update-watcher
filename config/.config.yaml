@@ -57,6 +57,8 @@ webhooks:
     avatar: "<image url>"
     # -- embed message author
     author: update-watcher
+    # -- embed message color, you have to use Decimal numeral system
+    color: 242424
     
   # -- slack webhook configuration
   # TODO: implement this webhook
