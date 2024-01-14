@@ -22,3 +22,11 @@ func HandleFatal(message string, err error) {
 		os.Exit(1)
 	}
 }
+
+func MapArr[T comparable, V comparable](arr []T, callback func(v T) V) []V {
+	newArr := make([]V, len(arr))
+	for i, v := range arr {
+		newArr[i] = callback(v)
+	}
+	return newArr
+}

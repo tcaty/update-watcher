@@ -18,7 +18,7 @@ type Webhook interface {
 }
 
 func Notify(wh Webhook, title string, href *markdown.Href) error {
-	description := fmt.Sprintf("New version released! Checkout %s", href.Get())
+	description := fmt.Sprintf("New version released! Checkout %s", href.Sprint())
 	payload, err := wh.CreatePayload(title, description)
 	if err != nil {
 		return fmt.Errorf("could not create http request empty payload: %v", err)

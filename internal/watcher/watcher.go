@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/tcaty/update-watcher/pkg/markdown"
 )
 
 // map target to it's latest version
@@ -16,6 +18,7 @@ type Watcher interface {
 	IsEnabled() bool
 	GetName() string
 	CreateUrl(target string) (string, error)
+	CreateHref(target string, version string) *markdown.Href
 	GetTargets() []string
 	GetLatestVersion(data []byte) (string, error)
 }

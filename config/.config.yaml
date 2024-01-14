@@ -8,9 +8,13 @@ watchers:
     # default value grafanadasboards
     name: grafanadashboards
     # -- specify dashboards ids to watch for updates
+    # name:  dashboard name to display
+    # id:    dashboard id to watch for updates
     dashboards:
-      - 1860
-      - 3662
+      - name: node-exporter-full
+        id: 1860
+      - name: prometheus-2-0-overview
+        id: 3662
 
   # -- dockerregistry watcher configuration
   dockerregistry:

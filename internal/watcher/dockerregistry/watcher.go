@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/tcaty/update-watcher/internal/config"
+	"github.com/tcaty/update-watcher/pkg/markdown"
 )
 
 type Watcher struct {
@@ -50,6 +51,13 @@ func (w *Watcher) CreateUrl(image string) (string, error) {
 	url := fmt.Sprintf("%s/namespaces/%s/repositories/%s/tags", w.baseUrl, ns, repo)
 
 	return url, nil
+}
+
+func (w *Watcher) CreateHref(target string, version string) *markdown.Href {
+	text := fmt.Sprintf("%s:%s", target, version)
+	link := fmt.Sprintf("https://hub.docker.com/r/%s/tags", target)
+	href := markdown.NewHref(text, link)
+	return href
 }
 
 func (w *Watcher) GetLatestVersion(data []byte) (string, error) {

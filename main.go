@@ -16,9 +16,9 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: refactor watcher
 // TODO: add crontab to config
-// TODO: create task for cronjob
+// TODO: add version regexp to config
+// TODO: add logger to gocron
 
 func main() {
 	flags := cmd.Execute()
