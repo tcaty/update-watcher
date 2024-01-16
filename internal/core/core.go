@@ -18,11 +18,11 @@ func Task(wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository
 }
 
 func task(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) error {
-	targets := wt.GetTargets()
+	targets := wt.Targets()
 	versionRecords, err := watcher.GetLatestVersions(wt, targets)
 
 	if err != nil {
-		return fmt.Errorf("could not get version records %s: %v", wt.GetName(), err)
+		return fmt.Errorf("could not get version records %s: %v", wt.Name(), err)
 	}
 
 	// update version record in database; notify on success
@@ -34,7 +34,7 @@ func task(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) e
 		// TODO: remove ! sign
 		if !updated {
 			for _, wh := range whs {
-				title := wt.GetName()
+				title := wt.Name()
 				href := wt.CreateHref(target, version)
 				if err := webhook.Notify(wh, title, href); err != nil {
 					return fmt.Errorf("could not notify: %v", err)

@@ -3,7 +3,7 @@ package utils
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
+	"log/slog"
 	"os"
 )
 
@@ -18,7 +18,7 @@ func CreateHttpRequestPayload(v any) (*bytes.Buffer, error) {
 
 func HandleFatal(message string, err error) {
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s: %v", message, err)
+		slog.Error(message, err)
 		os.Exit(1)
 	}
 }

@@ -3,9 +3,7 @@ package watcher
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
-	"os"
 
 	"github.com/tcaty/update-watcher/pkg/markdown"
 )
@@ -15,30 +13,12 @@ import (
 // dockerregistry: {"grafana/dashboard": "10.7.4"}
 type VersionRecords = map[string]string
 type Watcher interface {
-	IsEnabled() bool
-	GetName() string
+	Enabled() bool
+	Name() string
+	Targets() []string
 	CreateUrl(target string) (string, error)
 	CreateHref(target string, version string) *markdown.Href
-	GetTargets() []string
 	GetLatestVersion(data []byte, target string) (string, error)
-}
-
-func Initialize(w Watcher) error {
-	logger := log.New(os.Stdout, fmt.Sprintf("[%s] ", w.GetName()), log.Ldate|log.Ltime)
-
-	logger.Println("Reading configuration...")
-	if !w.IsEnabled() {
-		logger.Println("Watcher is disabled.")
-		return nil
-	}
-
-	// TODO: implement auth logic here
-	// somewhere here return error
-
-	logger.Println("Watcher is enabled.")
-	logger.Println("Watcher has been initialized successfully!")
-
-	return nil
 }
 
 func GetLatestVersions(w Watcher, targets []string) (VersionRecords, error) {

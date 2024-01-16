@@ -37,15 +37,15 @@ func NewWatcher(cfg config.Grafanadasboards) *Watcher {
 	}
 }
 
-func (w *Watcher) IsEnabled() bool {
+func (w *Watcher) Enabled() bool {
 	return w.enabled
 }
 
-func (w *Watcher) GetName() string {
+func (w *Watcher) Name() string {
 	return w.name
 }
 
-func (w *Watcher) GetTargets() []string {
+func (w *Watcher) Targets() []string {
 	targets := utils.MapArr(w.dashboards, func(d dashboard) string { return d.id })
 	return targets
 }

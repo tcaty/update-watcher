@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/spf13/viper"
@@ -36,7 +37,7 @@ func Parse(cfgFile string) (*Config, error) {
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("error occured during reading config file: %v", err)
 	}
-	fmt.Printf("Using config file: %s\n\n", viper.ConfigFileUsed())
+	slog.Info("Reading config...", "configFile", viper.ConfigFileUsed())
 
 	err := viper.Unmarshal(&cfg)
 	return cfg, err

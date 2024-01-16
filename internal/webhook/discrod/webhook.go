@@ -28,15 +28,15 @@ func NewWebhook(cfg config.Discord) *Discord {
 	}
 }
 
-func (w *Discord) IsEnabled() bool {
+func (w *Discord) Enabled() bool {
 	return w.enabled
 }
 
-func (w *Discord) GetName() string {
+func (w *Discord) Name() string {
 	return w.name
 }
 
-func (w *Discord) GetUrl() string {
+func (w *Discord) Url() string {
 	return w.url
 }
 

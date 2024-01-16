@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/tcaty/update-watcher/internal/config"
@@ -22,13 +23,12 @@ func New(cfg config.Postgresql) (*Repository, error) {
 		cfg.Port,
 		cfg.Database,
 	)
-	fmt.Printf("Using connection string: %s\n", connString)
-	fmt.Println("Connecting to database...")
+	slog.Info("Connecting to database...", "connString", connString)
 	conn, err := pgx.Connect(context.Background(), connString)
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("Connection to database completed successfully!")
+	slog.Info("Connection to database completed successfully")
 	return &Repository{conn: conn}, nil
 }
 

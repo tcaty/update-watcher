@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log/slog"
+	"os"
 
 	"github.com/go-co-op/gocron/v2"
 	"github.com/tcaty/update-watcher/cmd"
@@ -16,32 +18,47 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: add logger to gocron
+// TODO: complete logging
 // TODO: update message format
 
 func main() {
+	initLogger()
+
 	flags := cmd.Execute()
 	cfg, err := config.Parse(flags.CfgFile)
 	utils.HandleFatal("could not parse config", err)
 
+	slog.Info("Initializing repo...")
 	repo, err := initRepo(cfg.Postgresql)
 	utils.HandleFatal("could not initialize repo", err)
 	defer repo.Close()
+	slog.Info("Repo initialized successfully")
 
+	slog.Info("Initializing watchers...")
 	wts, err := initWatchers(cfg.Watchers)
 	utils.HandleFatal("could not initialize watchers", err)
+	slog.Info("Watchers initialized successfully")
 
+	slog.Info("Initializing webhooks...")
 	whs, err := initWebhooks(cfg.Webhooks)
 	utils.HandleFatal("could not initialize webhooks", err)
+	slog.Info("Webhooks initialized successfully")
 
+	slog.Info("Initializing scheduler...")
 	s, err := initScheduler(cfg.CronJob, wts, whs, repo)
 	utils.HandleFatal("could not initialize scheduler", err)
-	s.Start()
+	// s.Start()
 	defer s.Shutdown()
+	slog.Info("Repo initialized successfully")
 
 	// block current channel to run cronjob
 	// see: https://github.com/go-co-op/gocron/issues/647
 	select {}
+}
+
+func initLogger() {
+	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	slog.SetDefault(logger)
 }
 
 func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
@@ -59,15 +76,10 @@ func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
 }
 
 func initWatchers(cfg config.Watchers) ([]watcher.Watcher, error) {
-	watchers := []watcher.Watcher{
+	watchers := ([]watcher.Watcher{
 		grafanadashboards.NewWatcher(cfg.Grafanadasboards),
 		dockerregistry.NewWatcher(cfg.Dockerregistry),
-	}
-	for _, w := range watchers {
-		if err := watcher.Initialize(w); err != nil {
-			return nil, fmt.Errorf("could not initialize watcher %s: %v", w.GetName(), err)
-		}
-	}
+	})
 	return watchers, nil
 }
 
@@ -77,7 +89,7 @@ func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
 	}
 	for _, w := range webhooks {
 		if err := webhook.Ping(w); err != nil {
-			return nil, fmt.Errorf("could not ping webhook %s: %v", w.GetName(), err)
+			return nil, fmt.Errorf("could not ping webhook %s: %v", w.Name(), err)
 		}
 	}
 	return webhooks, nil

@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	"fmt"
+	"log/slog"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -14,15 +14,13 @@ type Flags struct {
 var (
 	rootFlags = &Flags{}
 	rootCmd   = &cobra.Command{
-		Use:   "watch",
-		Short: "Update watcher is tool for automatic updates check",
-		Long:  "[Long] Update watcher is tool for automatic updates check",
+		Use: "watch",
 	}
 )
 
 func Execute() *Flags {
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		slog.Error(err.Error())
 		os.Exit(1)
 	}
 	return rootFlags

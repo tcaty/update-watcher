@@ -40,15 +40,15 @@ func NewWatcher(cfg config.Dockerregistry) *Watcher {
 	}
 }
 
-func (w *Watcher) IsEnabled() bool {
+func (w *Watcher) Enabled() bool {
 	return w.enabled
 }
 
-func (w *Watcher) GetName() string {
+func (w *Watcher) Name() string {
 	return w.name
 }
 
-func (w *Watcher) GetTargets() []string {
+func (w *Watcher) Targets() []string {
 	targets := utils.MapArr(w.images, func(i image) string { return i.name })
 	return targets
 }

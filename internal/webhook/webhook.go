@@ -11,9 +11,9 @@ import (
 )
 
 type Webhook interface {
-	IsEnabled() bool
-	GetName() string
-	GetUrl() string
+	Enabled() bool
+	Name() string
+	Url() string
 	CreatePayload(title string, description string) (*bytes.Buffer, error)
 }
 
@@ -24,7 +24,7 @@ func Notify(wh Webhook, title string, href *markdown.Href) error {
 		return fmt.Errorf("could not create http request empty payload: %v", err)
 	}
 
-	url := wh.GetUrl()
+	url := wh.Url()
 	resp, err := http.Post(url, "application/json", payload)
 	if err != nil {
 		return fmt.Errorf("http post request err: %v", err)
@@ -45,7 +45,7 @@ func Notify(wh Webhook, title string, href *markdown.Href) error {
 }
 
 func Ping(w Webhook) error {
-	url := w.GetUrl()
+	url := w.Url()
 	empty, err := utils.CreateHttpRequestPayload(nil)
 	if err != nil {
 		return fmt.Errorf("could not create http request empty payload: %v", err)
