@@ -1,3 +1,14 @@
+# -- cronjob configuration
+cronjob:
+  # -- crontab configuration defines job schedule 
+  # using standard the crontab syntax `* * * * *`
+  # cron schedule expressions editor https://crontab.guru/
+  crontab: "* * * * * *"
+  # -- enables usage of optional 6th field in crontab
+  # if set to true syntax `* * * * * *` is allowed
+  withSeconds: true
+
+
 watchers:
   # -- grafanadasboards watcher configuration
   grafanadasboards:

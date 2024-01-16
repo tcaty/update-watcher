@@ -8,6 +8,7 @@ import (
 )
 
 type Config struct {
+	CronJob    CronJob    `yaml:"cronjob"`
 	Watchers   Watchers   `yaml:"watchers"`
 	Postgresql Postgresql `yaml:"postgresql"`
 	Webhooks   Webhooks   `yaml:"webhooks"`
@@ -30,13 +31,7 @@ func Parse(cfgFile string) (*Config, error) {
 	}
 
 	viper.AutomaticEnv()
-
-	viper.SetDefault("watchers.grafanadasboards.name", "grafanadasboards")
-	viper.SetDefault("watchers.dockerregistry.name", "dockerregistry")
-	viper.SetDefault("watchers.dockerregistry.enabled", false)
-	viper.SetDefault("watchers.grafanadasboards.name", false)
-	viper.SetDefault("webhooks.discord.enabled", false)
-	viper.SetDefault("webhooks.slack.enabled", false)
+	setDefaultValues()
 
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("error occured during reading config file: %v", err)
@@ -45,4 +40,18 @@ func Parse(cfgFile string) (*Config, error) {
 
 	err := viper.Unmarshal(&cfg)
 	return cfg, err
+}
+
+func setDefaultValues() {
+	// -- crontab
+	viper.SetDefault("crontab.crontab", "0 */12 * * *")
+	viper.SetDefault("crontab.withSeconds", false)
+	// -- watchers
+	viper.SetDefault("watchers.grafanadasboards.name", "grafanadasboards")
+	viper.SetDefault("watchers.dockerregistry.name", "dockerregistry")
+	viper.SetDefault("watchers.dockerregistry.enabled", false)
+	viper.SetDefault("watchers.grafanadasboards.name", false)
+	// -- webhooks
+	viper.SetDefault("webhooks.discord.enabled", false)
+	viper.SetDefault("webhooks.slack.enabled", false)
 }

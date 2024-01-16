@@ -16,7 +16,6 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: add crontab to config
 // TODO: add version regexp to config
 // TODO: add logger to gocron
 
@@ -35,7 +34,7 @@ func main() {
 	whs, err := initWebhooks(cfg.Webhooks)
 	utils.HandleFatal("could not initialize webhooks", err)
 
-	s, err := initScheduler(wts, whs, repo)
+	s, err := initScheduler(cfg.CronJob, wts, whs, repo)
 	utils.HandleFatal("could not initialize scheduler", err)
 	s.Start()
 	defer s.Shutdown()
@@ -84,13 +83,13 @@ func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
 	return webhooks, nil
 }
 
-func initScheduler(wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) (gocron.Scheduler, error) {
+func initScheduler(cfg config.CronJob, wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) (gocron.Scheduler, error) {
 	s, err := gocron.NewScheduler()
 	if err != nil {
 		return nil, fmt.Errorf("could not create scheduler: %v", err)
 	}
 	s.NewJob(
-		gocron.CronJob("* * * * * *", true),
+		gocron.CronJob(cfg.Crontab, cfg.WithSeconds),
 		gocron.NewTask(core.Task, wts, whs, r),
 	)
 	return s, nil
