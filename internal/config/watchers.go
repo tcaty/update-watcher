@@ -16,8 +16,13 @@ type Grafanadasboards struct {
 	Dashboards []Dashboard `yaml:"dashboards"`
 }
 
+type Image struct {
+	Name      string `yaml:"name"`
+	AllowTags string `yaml:"allowTags"`
+}
+
 type Dockerregistry struct {
-	Enabled bool     `yaml:"enabled"`
-	Name    string   `yaml:"name"`
-	Images  []string `yaml:"images"`
+	Enabled bool    `yaml:"enabled"`
+	Name    string  `yaml:"name"`
+	Images  []Image `yaml:"images"`
 }

@@ -51,6 +51,7 @@ func setDefaultValues() {
 	viper.SetDefault("watchers.dockerregistry.name", "dockerregistry")
 	viper.SetDefault("watchers.dockerregistry.enabled", false)
 	viper.SetDefault("watchers.grafanadasboards.name", false)
+	viper.SetDefault("watchers.dockerregistry.images[].allowTags", ".+")
 	// -- webhooks
 	viper.SetDefault("webhooks.discord.enabled", false)
 	viper.SetDefault("webhooks.slack.enabled", false)

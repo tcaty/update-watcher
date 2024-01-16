@@ -5,25 +5,38 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/tcaty/update-watcher/internal/config"
 	"github.com/tcaty/update-watcher/pkg/markdown"
+	"github.com/tcaty/update-watcher/pkg/utils"
 )
+
+type image struct {
+	name      string
+	allowTags string
+}
 
 type Watcher struct {
 	enabled bool
 	name    string
 	baseUrl string
-	images  []string
+	images  []image
 }
 
 func NewWatcher(cfg config.Dockerregistry) *Watcher {
 	baseUrl := "https://hub.docker.com/v2"
+	images := utils.MapArr(cfg.Images, func(i config.Image) image {
+		return image{
+			name:      i.Name,
+			allowTags: i.AllowTags,
+		}
+	})
 	return &Watcher{
 		enabled: cfg.Enabled,
 		name:    cfg.Name,
 		baseUrl: baseUrl,
-		images:  cfg.Images,
+		images:  images,
 	}
 }
 
@@ -36,7 +49,8 @@ func (w *Watcher) GetName() string {
 }
 
 func (w *Watcher) GetTargets() []string {
-	return w.images
+	targets := utils.MapArr(w.images, func(i image) string { return i.name })
+	return targets
 }
 
 func (w *Watcher) CreateUrl(image string) (string, error) {
@@ -60,7 +74,7 @@ func (w *Watcher) CreateHref(target string, version string) *markdown.Href {
 	return href
 }
 
-func (w *Watcher) GetLatestVersion(data []byte) (string, error) {
+func (w *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
 	var tags Tags
 
 	if err := json.Unmarshal(data, &tags); err != nil {
@@ -68,12 +82,28 @@ func (w *Watcher) GetLatestVersion(data []byte) (string, error) {
 	}
 
 	for _, t := range tags.Results {
-		name := t.Name
-		if name != "latest" {
-			return name, nil
+		tag := t.Name
+		allowTags := w.getAllowedTagsByName(target)
+		match, err := regexp.MatchString(allowTags, tag)
+		if err != nil {
+			return "", fmt.Errorf("wrong regexp pattern: %v", err)
+		}
+		if match {
+			return tag, nil
 		}
 	}
 
 	// if there are no tags except latest, only then return it
 	return "latest", nil
+}
+
+func (w *Watcher) getAllowedTagsByName(name string) string {
+	for _, i := range w.images {
+		if i.name == name {
+			return i.allowTags
+		}
+	}
+	// this case is not possible in general
+	// therefore error is useless here
+	return ".+"
 }

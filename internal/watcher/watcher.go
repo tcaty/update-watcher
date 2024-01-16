@@ -20,7 +20,7 @@ type Watcher interface {
 	CreateUrl(target string) (string, error)
 	CreateHref(target string, version string) *markdown.Href
 	GetTargets() []string
-	GetLatestVersion(data []byte) (string, error)
+	GetLatestVersion(data []byte, target string) (string, error)
 }
 
 func Initialize(w Watcher) error {
@@ -50,7 +50,7 @@ func GetLatestVersions(w Watcher, targets []string) (VersionRecords, error) {
 			return nil, fmt.Errorf("cannot create url: %v", err)
 		}
 
-		r, err := getLatestVersion(w, url)
+		r, err := getLatestVersion(w, url, t)
 		if err != nil {
 			return nil, err
 		}
@@ -61,7 +61,7 @@ func GetLatestVersions(w Watcher, targets []string) (VersionRecords, error) {
 	return versionRecords, nil
 }
 
-func getLatestVersion(w Watcher, url string) (string, error) {
+func getLatestVersion(w Watcher, url string, target string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("cannot get url: %v", err)
@@ -73,7 +73,7 @@ func getLatestVersion(w Watcher, url string) (string, error) {
 		return "", fmt.Errorf("cannot read body: %v", err)
 	}
 
-	latestVersion, err := w.GetLatestVersion(body)
+	latestVersion, err := w.GetLatestVersion(body, target)
 	if err != nil {
 		return "", fmt.Errorf("cannot get latest version: %v", err)
 	}

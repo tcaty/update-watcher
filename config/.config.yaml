@@ -36,9 +36,14 @@ watchers:
     # default value dockerregistry
     name: dockerregistry
     # -- specify images to watch for updates
+    # name:       image name to watch for update
+    # allowTags:  image tags regexp that are allowed
+    # default value is ".+" that match everything
     images:
-      - vitess/lite
-      - grafana/grafana
+      - name: vitess/lite
+        allowTags: .+
+      - name: grafana/grafana
+        allowTags: 10\.0\.\d+
         
 
 postgresql:

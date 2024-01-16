@@ -46,10 +46,7 @@ func (w *Watcher) GetName() string {
 }
 
 func (w *Watcher) GetTargets() []string {
-	targets := make([]string, len(w.dashboards))
-	for i, d := range w.dashboards {
-		targets[i] = d.id
-	}
+	targets := utils.MapArr(w.dashboards, func(d dashboard) string { return d.id })
 	return targets
 }
 
@@ -64,7 +61,7 @@ func (w *Watcher) CreateHref(target string, version string) *markdown.Href {
 	return href
 }
 
-func (w *Watcher) GetLatestVersion(data []byte) (string, error) {
+func (w *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
 	var revisions Revisions
 
 	if err := json.Unmarshal(data, &revisions); err != nil {

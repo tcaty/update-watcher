@@ -16,8 +16,8 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: add version regexp to config
 // TODO: add logger to gocron
+// TODO: update message format
 
 func main() {
 	flags := cmd.Execute()
