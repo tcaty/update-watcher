@@ -9,7 +9,7 @@ import (
 	"github.com/tcaty/update-watcher/pkg/markdown"
 )
 
-// map target to it's latest version
+// map target unique identifier to it's latest version
 // grafanadashboards: {"1860": "31"}
 // dockerregistry: {"grafana/dashboard": "10.7.4"}
 type VersionRecords = map[string]string
@@ -23,7 +23,7 @@ type Watcher interface {
 	GetLatestVersion(data []byte, target string) (string, error)
 }
 
-func GetLatestVersions(w Watcher, targets []string) (VersionRecords, error) {
+func FetchLatestVersionRecords(w Watcher, targets []string) (VersionRecords, error) {
 	versionRecords := make(VersionRecords, len(targets))
 
 	for _, t := range targets {
@@ -32,18 +32,18 @@ func GetLatestVersions(w Watcher, targets []string) (VersionRecords, error) {
 			return nil, fmt.Errorf("cannot create url: %v", err)
 		}
 
-		r, err := getLatestVersion(w, url, t)
+		v, err := fetchLatestVersion(w, url, t)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("cannot fetch latest version %s: %v", url, err)
 		}
 
-		versionRecords[t] = r
+		versionRecords[t] = v
 	}
 
 	return versionRecords, nil
 }
 
-func getLatestVersion(w Watcher, url string, target string) (string, error) {
+func fetchLatestVersion(w Watcher, url string, target string) (string, error) {
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", fmt.Errorf("cannot get url: %v", err)

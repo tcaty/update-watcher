@@ -19,9 +19,11 @@ type Webhook interface {
 	CreatePayload(title string, description string) (*bytes.Buffer, error)
 }
 
-func Notify(wh Webhook, title string, href *markdown.Href) error {
-	description := fmt.Sprintf("New version released! Checkout %s", href.Sprint())
-	payload, err := wh.CreatePayload(title, description)
+func Notify(wh Webhook, title string, hrefs []*markdown.Href) error {
+	descr := markdown.CreateUnorderedList(
+		utils.MapArr(hrefs, func(h *markdown.Href) string { return h.Sprint() }),
+	)
+	payload, err := wh.CreatePayload(title, descr)
 	if err != nil {
 		return fmt.Errorf("could not create http request empty payload: %v", err)
 	}

@@ -57,7 +57,7 @@ func main() {
 	if err != nil {
 		utils.HandleFatal("could not initialize scheduler", err)
 	}
-	// s.Start()
+	s.Start()
 	defer s.Shutdown()
 	slog.Info("repo initialized successfully")
 
@@ -119,7 +119,7 @@ func initScheduler(cfg config.CronJob, wts []watcher.Watcher, whs []webhook.Webh
 	}
 	s.NewJob(
 		gocron.CronJob(cfg.Crontab, cfg.WithSeconds),
-		gocron.NewTask(core.Task, wts, whs, r),
+		gocron.NewTask(core.WatchForUpdates, wts, whs, r),
 	)
 	return s, nil
 }
