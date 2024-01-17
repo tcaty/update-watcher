@@ -3,6 +3,7 @@ package watcher
 import (
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 
 	"github.com/tcaty/update-watcher/pkg/markdown"
@@ -13,6 +14,7 @@ import (
 // dockerregistry: {"grafana/dashboard": "10.7.4"}
 type VersionRecords = map[string]string
 type Watcher interface {
+	Slog() *slog.Logger
 	Enabled() bool
 	Name() string
 	Targets() []string

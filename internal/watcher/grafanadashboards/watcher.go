@@ -3,6 +3,7 @@ package grafanadashboards
 import (
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"strconv"
 
 	"github.com/tcaty/update-watcher/internal/config"
@@ -16,6 +17,7 @@ type dashboard struct {
 }
 
 type Watcher struct {
+	slog       *slog.Logger
 	enabled    bool
 	name       string
 	baseUrl    string
@@ -30,11 +32,16 @@ func NewWatcher(cfg config.Grafanadasboards) *Watcher {
 		}
 	})
 	return &Watcher{
+		slog:       slog.Default().With("watcher", cfg.Name),
 		enabled:    cfg.Enabled,
 		name:       cfg.Name,
 		baseUrl:    "https://grafana.com",
 		dashboards: dashboards,
 	}
+}
+
+func (w *Watcher) Slog() *slog.Logger {
+	return w.slog
 }
 
 func (w *Watcher) Enabled() bool {

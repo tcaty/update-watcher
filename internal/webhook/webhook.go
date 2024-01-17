@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 
 	"github.com/tcaty/update-watcher/pkg/markdown"
@@ -11,6 +12,7 @@ import (
 )
 
 type Webhook interface {
+	Slog() *slog.Logger
 	Enabled() bool
 	Name() string
 	Url() string

@@ -26,30 +26,40 @@ func main() {
 
 	flags := cmd.Execute()
 	cfg, err := config.Parse(flags.CfgFile)
-	utils.HandleFatal("could not parse config", err)
+	if err != nil {
+		utils.HandleFatal("could not parse config", err)
+	}
 
-	slog.Info("Initializing repo...")
+	slog.Info("initializing repo...")
 	repo, err := initRepo(cfg.Postgresql)
-	utils.HandleFatal("could not initialize repo", err)
+	if err != nil {
+		utils.HandleFatal("could not initialize repo", err)
+	}
 	defer repo.Close()
-	slog.Info("Repo initialized successfully")
+	slog.Info("repo initialized successfully")
 
-	slog.Info("Initializing watchers...")
+	slog.Info("initializing watchers...")
 	wts, err := initWatchers(cfg.Watchers)
-	utils.HandleFatal("could not initialize watchers", err)
-	slog.Info("Watchers initialized successfully")
+	if err != nil {
+		utils.HandleFatal("could not initialize watchers", err)
+	}
+	slog.Info("watchers initialized successfully")
 
-	slog.Info("Initializing webhooks...")
+	slog.Info("initializing webhooks...")
 	whs, err := initWebhooks(cfg.Webhooks)
-	utils.HandleFatal("could not initialize webhooks", err)
-	slog.Info("Webhooks initialized successfully")
+	if err != nil {
+		utils.HandleFatal("could not initialize webhooks", err)
+	}
+	slog.Info("webhooks initialized successfully")
 
-	slog.Info("Initializing scheduler...")
+	slog.Info("initializing scheduler...")
 	s, err := initScheduler(cfg.CronJob, wts, whs, repo)
-	utils.HandleFatal("could not initialize scheduler", err)
+	if err != nil {
+		utils.HandleFatal("could not initialize scheduler", err)
+	}
 	// s.Start()
 	defer s.Shutdown()
-	slog.Info("Repo initialized successfully")
+	slog.Info("repo initialized successfully")
 
 	// block current channel to run cronjob
 	// see: https://github.com/go-co-op/gocron/issues/647
@@ -66,12 +76,18 @@ func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to database: %v", err)
 	}
+	repo.Slog().Info("connection established")
+
 	if err := repo.Ping(); err != nil {
 		return nil, fmt.Errorf("unable to ping database: %v", err)
 	}
+	repo.Slog().Info("ping is successful")
+
 	if err := repo.InitializeTables(); err != nil {
 		return nil, fmt.Errorf("unable to initialize database tables: %v", err)
 	}
+	repo.Slog().Info("tables initialized successfully")
+
 	return repo, nil
 }
 
@@ -91,6 +107,7 @@ func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
 		if err := webhook.Ping(w); err != nil {
 			return nil, fmt.Errorf("could not ping webhook %s: %v", w.Name(), err)
 		}
+		w.Slog().Info("ping is successful")
 	}
 	return webhooks, nil
 }

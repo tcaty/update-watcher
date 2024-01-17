@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log/slog"
 	"regexp"
 
 	"github.com/tcaty/update-watcher/internal/config"
@@ -18,6 +19,7 @@ type image struct {
 }
 
 type Watcher struct {
+	slog    *slog.Logger
 	enabled bool
 	name    string
 	baseUrl string
@@ -33,11 +35,16 @@ func NewWatcher(cfg config.Dockerregistry) *Watcher {
 		}
 	})
 	return &Watcher{
+		slog:    slog.Default().With("watcher", cfg.Name),
 		enabled: cfg.Enabled,
 		name:    cfg.Name,
 		baseUrl: baseUrl,
 		images:  images,
 	}
+}
+
+func (w *Watcher) Slog() *slog.Logger {
+	return w.slog
 }
 
 func (w *Watcher) Enabled() bool {

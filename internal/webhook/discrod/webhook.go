@@ -3,12 +3,14 @@ package discrod
 import (
 	"bytes"
 	"fmt"
+	"log/slog"
 
 	"github.com/tcaty/update-watcher/internal/config"
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
 type Discord struct {
+	slog    *slog.Logger
 	enabled bool
 	name    string
 	url     string
@@ -19,13 +21,17 @@ type Discord struct {
 
 func NewWebhook(cfg config.Discord) *Discord {
 	return &Discord{
-		enabled: cfg.Enabled,
-		name:    cfg.Name,
-		url:     cfg.Url,
-		avatar:  cfg.Avatar,
-		author:  cfg.Author,
-		color:   cfg.Color,
+		slog:   slog.Default().With("webhook", cfg.Name),
+		name:   cfg.Name,
+		url:    cfg.Url,
+		avatar: cfg.Avatar,
+		author: cfg.Author,
+		color:  cfg.Color,
 	}
+}
+
+func (w *Discord) Slog() *slog.Logger {
+	return w.slog
 }
 
 func (w *Discord) Enabled() bool {

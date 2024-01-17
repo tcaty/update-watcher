@@ -17,10 +17,8 @@ func CreateHttpRequestPayload(v any) (*bytes.Buffer, error) {
 }
 
 func HandleFatal(message string, err error) {
-	if err != nil {
-		slog.Error(message, err)
-		os.Exit(1)
-	}
+	slog.Error(message, err)
+	os.Exit(1)
 }
 
 func MapArr[T comparable, V comparable](arr []T, callback func(v T) V) []V {

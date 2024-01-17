@@ -11,6 +11,7 @@ import (
 )
 
 type Repository struct {
+	slog *slog.Logger
 	conn *pgx.Conn
 }
 
@@ -23,13 +24,22 @@ func New(cfg config.Postgresql) (*Repository, error) {
 		cfg.Port,
 		cfg.Database,
 	)
-	slog.Info("Connecting to database...", "connString", connString)
+
 	conn, err := pgx.Connect(context.Background(), connString)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not connect to database %s: %v", cfg.Database, err)
 	}
-	slog.Info("Connection to database completed successfully")
-	return &Repository{conn: conn}, nil
+
+	r := &Repository{
+		slog: slog.Default().With("database", cfg.Database),
+		conn: conn,
+	}
+
+	return r, nil
+}
+
+func (r *Repository) Slog() *slog.Logger {
+	return r.slog
 }
 
 func (r *Repository) Ping() error {
