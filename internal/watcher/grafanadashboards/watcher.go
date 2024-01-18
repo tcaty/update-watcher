@@ -42,39 +42,39 @@ func NewWatcher(cfg config.Grafanadasboards) *Watcher {
 	}
 }
 
-func (w *Watcher) Slog() *slog.Logger {
-	return w.slog
+func (wt *Watcher) Slog() *slog.Logger {
+	return wt.slog
 }
 
-func (w *Watcher) Enabled() bool {
-	return w.enabled
+func (wt *Watcher) Enabled() bool {
+	return wt.enabled
 }
 
-func (w *Watcher) Name() string {
-	return w.name
+func (wt *Watcher) Name() string {
+	return wt.name
 }
 
-func (w *Watcher) Targets() []string {
-	targets := utils.MapArr(w.dashboards, func(d dashboard) string { return d.id })
+func (wt *Watcher) Targets() []string {
+	targets := utils.MapArr(wt.dashboards, func(d dashboard) string { return d.id })
 	return targets
 }
 
-func (w *Watcher) Embed() *config.Embed {
-	return w.embed
+func (wt *Watcher) Embed() *config.Embed {
+	return wt.embed
 }
 
-func (w *Watcher) CreateUrl(dashboard string) (string, error) {
-	return fmt.Sprintf("%s/api/dashboards/%s/revisions", w.baseUrl, dashboard), nil
+func (wt *Watcher) CreateUrl(dashboard string) (string, error) {
+	return fmt.Sprintf("%s/api/dashboards/%s/revisions", wt.baseUrl, dashboard), nil
 }
 
-func (w *Watcher) CreateHref(target string, version string) *markdown.Href {
-	text := fmt.Sprintf("%s revision %s", w.getDashboardNameById(target), version)
+func (wt *Watcher) CreateHref(target string, version string) *markdown.Href {
+	text := fmt.Sprintf("%s revision %s", wt.getDashboardNameById(target), version)
 	link := fmt.Sprintf("https://grafana.com/grafana/dashboards/%s/?tab=revisions", target)
 	href := markdown.NewHref(text, link)
 	return href
 }
 
-func (w *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
+func (wt *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
 	var revisions Revisions
 
 	if err := json.Unmarshal(data, &revisions); err != nil {
@@ -85,8 +85,8 @@ func (w *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
 	return strconv.Itoa(latest.Revision), nil
 }
 
-func (w *Watcher) getDashboardNameById(id string) string {
-	for _, d := range w.dashboards {
+func (wt *Watcher) getDashboardNameById(id string) string {
+	for _, d := range wt.dashboards {
 		if d.id == id {
 			return d.name
 		}

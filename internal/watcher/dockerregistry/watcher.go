@@ -45,28 +45,28 @@ func NewWatcher(cfg config.Dockerregistry) *Watcher {
 	}
 }
 
-func (w *Watcher) Slog() *slog.Logger {
-	return w.slog
+func (wt *Watcher) Slog() *slog.Logger {
+	return wt.slog
 }
 
-func (w *Watcher) Enabled() bool {
-	return w.enabled
+func (wt *Watcher) Enabled() bool {
+	return wt.enabled
 }
 
-func (w *Watcher) Name() string {
-	return w.name
+func (wt *Watcher) Name() string {
+	return wt.name
 }
 
-func (w *Watcher) Targets() []string {
-	targets := utils.MapArr(w.images, func(i image) string { return i.name })
+func (wt *Watcher) Targets() []string {
+	targets := utils.MapArr(wt.images, func(i image) string { return i.name })
 	return targets
 }
 
-func (w *Watcher) Embed() *config.Embed {
-	return w.embed
+func (wt *Watcher) Embed() *config.Embed {
+	return wt.embed
 }
 
-func (w *Watcher) CreateUrl(image string) (string, error) {
+func (wt *Watcher) CreateUrl(image string) (string, error) {
 	b := []byte(image)
 	i := bytes.IndexByte(b, byte('/'))
 
@@ -75,19 +75,19 @@ func (w *Watcher) CreateUrl(image string) (string, error) {
 	}
 
 	ns, repo := string(b[:i]), string(b[i+1:])
-	url := fmt.Sprintf("%s/namespaces/%s/repositories/%s/tags", w.baseUrl, ns, repo)
+	url := fmt.Sprintf("%s/namespaces/%s/repositories/%s/tags", wt.baseUrl, ns, repo)
 
 	return url, nil
 }
 
-func (w *Watcher) CreateHref(target string, version string) *markdown.Href {
+func (wt *Watcher) CreateHref(target string, version string) *markdown.Href {
 	text := fmt.Sprintf("%s:%s", target, version)
 	link := fmt.Sprintf("https://hub.docker.com/r/%s/tags", target)
 	href := markdown.NewHref(text, link)
 	return href
 }
 
-func (w *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
+func (wt *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
 	var tags Tags
 
 	if err := json.Unmarshal(data, &tags); err != nil {
@@ -96,7 +96,7 @@ func (w *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
 
 	for _, t := range tags.Results {
 		tag := t.Name
-		allowTags := w.getAllowedTagsByName(target)
+		allowTags := wt.getAllowedTagsByName(target)
 		match, err := regexp.MatchString(allowTags, tag)
 		if err != nil {
 			return "", fmt.Errorf("wrong regexp pattern: %v", err)
@@ -110,8 +110,8 @@ func (w *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
 	return "latest", nil
 }
 
-func (w *Watcher) getAllowedTagsByName(name string) string {
-	for _, i := range w.images {
+func (wt *Watcher) getAllowedTagsByName(name string) string {
+	for _, i := range wt.images {
 		if i.name == name {
 			return i.allowTags
 		}

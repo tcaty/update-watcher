@@ -10,38 +10,38 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-type Discord struct {
+type Webhook struct {
 	slog    *slog.Logger
 	enabled bool
 	name    string
 	url     string
 }
 
-func NewWebhook(cfg config.Discord) *Discord {
-	return &Discord{
+func NewWebhook(cfg config.Discord) *Webhook {
+	return &Webhook{
 		slog: slog.Default().With("webhook", cfg.Name),
 		name: cfg.Name,
 		url:  cfg.Url,
 	}
 }
 
-func (w *Discord) Slog() *slog.Logger {
-	return w.slog
+func (wh *Webhook) Slog() *slog.Logger {
+	return wh.slog
 }
 
-func (w *Discord) Enabled() bool {
-	return w.enabled
+func (wh *Webhook) Enabled() bool {
+	return wh.enabled
 }
 
-func (w *Discord) Name() string {
-	return w.name
+func (wh *Webhook) Name() string {
+	return wh.name
 }
 
-func (w *Discord) Url() string {
-	return w.url
+func (wh *Webhook) Url() string {
+	return wh.url
 }
 
-func (w *Discord) CreatePayload(msg *webhook.Message) (*bytes.Buffer, error) {
+func (wh *Webhook) CreatePayload(msg *webhook.Message) (*bytes.Buffer, error) {
 	author := Author{
 		Name:    msg.Author,
 		IconUrl: msg.Avatar,
