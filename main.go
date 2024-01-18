@@ -19,6 +19,7 @@ import (
 )
 
 // TODO: complete logging
+// TODO: set default values
 
 func main() {
 	initLogger()

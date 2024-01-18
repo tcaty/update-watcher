@@ -33,6 +33,8 @@ watchers:
       avatar: "https://cdn.icon-icons.com/icons2/2699/PNG/512/grafana_logo_icon_171048.png"
       # -- embed message color, you have to use Decimal numeral system
       color: 16296468
+      # -- embed message text that displays above versions list
+      text: "New revesions released! Checkout:"
 
   # -- dockerregistry watcher configuration
   dockerregistry:
@@ -58,6 +60,8 @@ watchers:
       avatar: "https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png"
       # -- embed message color, you have to use Decimal numeral system
       color: 242424
+      # -- embed message text that displays above versions list
+      text: "New tags released! Checkout:"
         
 
 postgresql:

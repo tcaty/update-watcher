@@ -53,7 +53,7 @@ func createMessage(wt watcher.Watcher, hrefs []*markdown.Href) *webhook.Message 
 	list := markdown.CreateUnorderedList(
 		utils.MapArr(hrefs, func(h *markdown.Href) string { return h.Sprint() }),
 	)
-	descr := fmt.Sprintf("New versions released! Checkout:\n%s", list)
+	descr := fmt.Sprintf("%s\n%s", wt.Embed().Text, list)
 	msg := &webhook.Message{
 		Author:      wt.Name(),
 		Avatar:      wt.Embed().Avatar,

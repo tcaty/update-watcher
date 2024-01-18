@@ -22,6 +22,7 @@ type Dockerregistry struct {
 type Embed struct {
 	Avatar string `yaml:"avatar"`
 	Color  int    `yaml:"color"`
+	Text   string `yaml:"text"`
 }
 
 type Dashboard struct {
