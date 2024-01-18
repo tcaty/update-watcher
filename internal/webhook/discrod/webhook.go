@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/tcaty/update-watcher/internal/config"
+	"github.com/tcaty/update-watcher/internal/webhook"
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
@@ -14,19 +15,13 @@ type Discord struct {
 	enabled bool
 	name    string
 	url     string
-	avatar  string
-	author  string
-	color   int
 }
 
 func NewWebhook(cfg config.Discord) *Discord {
 	return &Discord{
-		slog:   slog.Default().With("webhook", cfg.Name),
-		name:   cfg.Name,
-		url:    cfg.Url,
-		avatar: cfg.Avatar,
-		author: cfg.Author,
-		color:  cfg.Color,
+		slog: slog.Default().With("webhook", cfg.Name),
+		name: cfg.Name,
+		url:  cfg.Url,
 	}
 }
 
@@ -46,16 +41,15 @@ func (w *Discord) Url() string {
 	return w.url
 }
 
-func (w *Discord) CreatePayload(title string, description string) (*bytes.Buffer, error) {
+func (w *Discord) CreatePayload(msg *webhook.Message) (*bytes.Buffer, error) {
 	author := Author{
-		Name:    w.author,
-		IconUrl: w.avatar,
+		Name:    msg.Author,
+		IconUrl: msg.Avatar,
 	}
 	embed := Embed{
 		Author:      author,
-		Title:       title,
-		Description: description,
-		Color:       w.color,
+		Description: msg.Description,
+		Color:       msg.Color,
 	}
 	message := Message{
 		Embeds: []Embed{embed},

@@ -7,6 +7,7 @@ import (
 	"github.com/tcaty/update-watcher/internal/watcher"
 	"github.com/tcaty/update-watcher/internal/webhook"
 	"github.com/tcaty/update-watcher/pkg/markdown"
+	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
 func WatchForUpdates(wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) {
@@ -39,11 +40,25 @@ func watchForUpdates(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Re
 	}
 
 	for _, wh := range whs {
-		title := wt.Name()
-		if err := webhook.Notify(wh, title, updatedTargetsHrefs); err != nil {
+		msg := createMessage(wt, updatedTargetsHrefs)
+		if err := webhook.Notify(wh, msg); err != nil {
 			return fmt.Errorf("could not notify: %v", err)
 		}
 	}
 
 	return nil
+}
+
+func createMessage(wt watcher.Watcher, hrefs []*markdown.Href) *webhook.Message {
+	list := markdown.CreateUnorderedList(
+		utils.MapArr(hrefs, func(h *markdown.Href) string { return h.Sprint() }),
+	)
+	descr := fmt.Sprintf("New versions released! Checkout:\n%s", list)
+	msg := &webhook.Message{
+		Author:      wt.Name(),
+		Avatar:      wt.Embed().Avatar,
+		Description: descr,
+		Color:       wt.Embed().Color,
+	}
+	return msg
 }

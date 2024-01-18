@@ -11,17 +11,18 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-type dashboard struct {
-	name string
-	id   string
-}
-
 type Watcher struct {
 	slog       *slog.Logger
 	enabled    bool
 	name       string
 	baseUrl    string
 	dashboards []dashboard
+	embed      *config.Embed
+}
+
+type dashboard struct {
+	name string
+	id   string
 }
 
 func NewWatcher(cfg config.Grafanadasboards) *Watcher {
@@ -37,6 +38,7 @@ func NewWatcher(cfg config.Grafanadasboards) *Watcher {
 		name:       cfg.Name,
 		baseUrl:    "https://grafana.com",
 		dashboards: dashboards,
+		embed:      &cfg.Embed,
 	}
 }
 
@@ -55,6 +57,10 @@ func (w *Watcher) Name() string {
 func (w *Watcher) Targets() []string {
 	targets := utils.MapArr(w.dashboards, func(d dashboard) string { return d.id })
 	return targets
+}
+
+func (w *Watcher) Embed() *config.Embed {
+	return w.embed
 }
 
 func (w *Watcher) CreateUrl(dashboard string) (string, error) {

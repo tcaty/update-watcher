@@ -26,6 +26,13 @@ watchers:
         id: 1860
       - name: prometheus-2-0-overview
         id: 3662
+    # -- webhook embed message settings
+    embed: 
+      # -- embed message avatar url
+      # default is grafana logo
+      avatar: "https://cdn.icon-icons.com/icons2/2699/PNG/512/grafana_logo_icon_171048.png"
+      # -- embed message color, you have to use Decimal numeral system
+      color: 16296468
 
   # -- dockerregistry watcher configuration
   dockerregistry:
@@ -44,6 +51,13 @@ watchers:
         allowTags: .+
       - name: grafana/grafana
         allowTags: 10\.0\.\d+
+    # -- webhook embed message settings
+    embed: 
+      # -- embed message avatar url
+      # default is docker logo
+      avatar: "https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png"
+      # -- embed message color, you have to use Decimal numeral system
+      color: 242424
         
 
 postgresql:
@@ -73,12 +87,6 @@ webhooks:
     name: discord
     # -- secret webhook url
     url: "<webhook url>"
-    # -- embed message avatar url
-    avatar: "<image url>"
-    # -- embed message author
-    author: update-watcher
-    # -- embed message color, you have to use Decimal numeral system
-    color: 242424
     
   # -- slack webhook configuration
   # TODO: implement this webhook

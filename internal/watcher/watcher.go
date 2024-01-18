@@ -6,22 +6,25 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/tcaty/update-watcher/internal/config"
 	"github.com/tcaty/update-watcher/pkg/markdown"
 )
 
-// map target unique identifier to it's latest version
-// grafanadashboards: {"1860": "31"}
-// dockerregistry: {"grafana/dashboard": "10.7.4"}
-type VersionRecords = map[string]string
 type Watcher interface {
 	Slog() *slog.Logger
 	Enabled() bool
 	Name() string
 	Targets() []string
+	Embed() *config.Embed
 	CreateUrl(target string) (string, error)
 	CreateHref(target string, version string) *markdown.Href
 	GetLatestVersion(data []byte, target string) (string, error)
 }
+
+// map target unique identifier to it's latest version
+// grafanadashboards: {"1860": "31"}
+// dockerregistry: {"grafana/dashboard": "10.7.4"}
+type VersionRecords = map[string]string
 
 func FetchLatestVersionRecords(w Watcher, targets []string) (VersionRecords, error) {
 	versionRecords := make(VersionRecords, len(targets))

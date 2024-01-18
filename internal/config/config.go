@@ -37,7 +37,7 @@ func Parse(cfgFile string) (*Config, error) {
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("error occured during reading config file: %v", err)
 	}
-	slog.Info("Reading config...", "configFile", viper.ConfigFileUsed())
+	slog.Info("reading config...", "configFile", viper.ConfigFileUsed())
 
 	err := viper.Unmarshal(&cfg)
 	return cfg, err

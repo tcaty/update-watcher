@@ -5,24 +5,31 @@ type Watchers struct {
 	Dockerregistry   Dockerregistry   `yaml:"dockerregistry"`
 }
 
-type Dashboard struct {
-	Name string `yaml:"name"`
-	Id   string `yaml:"id"`
-}
-
 type Grafanadasboards struct {
 	Enabled    bool        `yaml:"enabled"`
 	Name       string      `yaml:"name"`
 	Dashboards []Dashboard `yaml:"dashboards"`
-}
-
-type Image struct {
-	Name      string `yaml:"name"`
-	AllowTags string `yaml:"allowTags"`
+	Embed      Embed       `yaml:"embed"`
 }
 
 type Dockerregistry struct {
 	Enabled bool    `yaml:"enabled"`
 	Name    string  `yaml:"name"`
 	Images  []Image `yaml:"images"`
+	Embed   Embed   `yaml:"embed"`
+}
+
+type Embed struct {
+	Avatar string `yaml:"avatar"`
+	Color  int    `yaml:"color"`
+}
+
+type Dashboard struct {
+	Name string `yaml:"name"`
+	Id   string `yaml:"id"`
+}
+
+type Image struct {
+	Name      string `yaml:"name"`
+	AllowTags string `yaml:"allowTags"`
 }

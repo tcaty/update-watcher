@@ -20,6 +20,8 @@ import (
 
 // TODO: complete logging
 // TODO: update message format
+// TODO: wt = Watcher, wh = Webhook
+// TODO: check discord webhook name
 
 func main() {
 	initLogger()

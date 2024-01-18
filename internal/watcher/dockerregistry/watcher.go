@@ -13,17 +13,18 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-type image struct {
-	name      string
-	allowTags string
-}
-
 type Watcher struct {
 	slog    *slog.Logger
 	enabled bool
 	name    string
 	baseUrl string
 	images  []image
+	embed   *config.Embed
+}
+
+type image struct {
+	name      string
+	allowTags string
 }
 
 func NewWatcher(cfg config.Dockerregistry) *Watcher {
@@ -40,6 +41,7 @@ func NewWatcher(cfg config.Dockerregistry) *Watcher {
 		name:    cfg.Name,
 		baseUrl: baseUrl,
 		images:  images,
+		embed:   &cfg.Embed,
 	}
 }
 
@@ -58,6 +60,10 @@ func (w *Watcher) Name() string {
 func (w *Watcher) Targets() []string {
 	targets := utils.MapArr(w.images, func(i image) string { return i.name })
 	return targets
+}
+
+func (w *Watcher) Embed() *config.Embed {
+	return w.embed
 }
 
 func (w *Watcher) CreateUrl(image string) (string, error) {

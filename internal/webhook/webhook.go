@@ -7,23 +7,26 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/tcaty/update-watcher/pkg/markdown"
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
+
+type Message struct {
+	Author      string
+	Avatar      string
+	Description string
+	Color       int
+}
 
 type Webhook interface {
 	Slog() *slog.Logger
 	Enabled() bool
 	Name() string
 	Url() string
-	CreatePayload(title string, description string) (*bytes.Buffer, error)
+	CreatePayload(msg *Message) (*bytes.Buffer, error)
 }
 
-func Notify(wh Webhook, title string, hrefs []*markdown.Href) error {
-	descr := markdown.CreateUnorderedList(
-		utils.MapArr(hrefs, func(h *markdown.Href) string { return h.Sprint() }),
-	)
-	payload, err := wh.CreatePayload(title, descr)
+func Notify(wh Webhook, msg *Message) error {
+	payload, err := wh.CreatePayload(msg)
 	if err != nil {
 		return fmt.Errorf("could not create http request empty payload: %v", err)
 	}

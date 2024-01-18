@@ -54,25 +54,29 @@ func (r *Repository) InitializeTables() error {
 func (r *Repository) UpdateVersionRecord(target string, version string) (bool, error) {
 	doesVersionRecordExist, err := r.doesVersionRecordExist(target)
 	if err != nil {
-		return false, fmt.Errorf("update version record err: %v", err)
+		return false, fmt.Errorf("unable to check version record for existence: %v", err)
 	}
+
 	if doesVersionRecordExist {
 		doesVersionRecordNeedUpdate, err := r.doesVersionRecordNeedUpdate(target, version)
 		if err != nil {
-			return false, fmt.Errorf("update version record err: %v", err)
+			return false, fmt.Errorf("unable to check the need for version record update: %v", err)
 		}
+
 		if doesVersionRecordNeedUpdate {
 			err = r.setVersion(target, version)
 			if err != nil {
-				return false, fmt.Errorf("update version record err: %v", err)
+				return false, fmt.Errorf("unable to set version: %v", err)
 			}
 			return true, nil
 		}
+
 	} else {
 		if err := r.insertVersionRecord(target, version); err != nil {
-			return false, fmt.Errorf("update version record err: %v", err)
+			return false, fmt.Errorf("unable to insert version record: %v", err)
 		}
 	}
+
 	return false, nil
 }
 
