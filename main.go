@@ -22,12 +22,14 @@ import (
 // TODO: set default values
 
 func main() {
-	initLogger()
-
 	flags := cmd.Execute()
 	cfg, err := config.Parse(flags.CfgFile)
 	if err != nil {
 		utils.HandleFatal("could not parse config", err)
+	}
+
+	if err := initLogger(cfg.Logger); err != nil {
+		utils.HandleFatal("could not init logger", err)
 	}
 
 	slog.Info("initializing repo...")
@@ -36,21 +38,18 @@ func main() {
 		utils.HandleFatal("could not initialize repo", err)
 	}
 	defer repo.Close()
-	slog.Info("repo initialized successfully")
 
 	slog.Info("initializing watchers...")
 	wts, err := initWatchers(cfg.Watchers)
 	if err != nil {
 		utils.HandleFatal("could not initialize watchers", err)
 	}
-	slog.Info("watchers initialized successfully")
 
 	slog.Info("initializing webhooks...")
 	whs, err := initWebhooks(cfg.Webhooks)
 	if err != nil {
 		utils.HandleFatal("could not initialize webhooks", err)
 	}
-	slog.Info("webhooks initialized successfully")
 
 	slog.Info("initializing scheduler...")
 	s, err := initScheduler(cfg.CronJob, wts, whs, repo)
@@ -59,16 +58,24 @@ func main() {
 	}
 	s.Start()
 	defer s.Shutdown()
-	slog.Info("repo initialized successfully")
 
+	slog.Info("everything is ready. starting watching for updates.")
 	// block current channel to run cronjob
 	// see: https://github.com/go-co-op/gocron/issues/647
 	select {}
 }
 
-func initLogger() {
-	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+func initLogger(cfg config.Logger) error {
+	level := new(slog.LevelVar)
+	err := level.UnmarshalText([]byte(cfg.LogLevel))
+	if err != nil {
+		return fmt.Errorf("unable to parse logLevel")
+	}
+	logger := slog.New(slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{
+		Level: level,
+	}))
 	slog.SetDefault(logger)
+	return nil
 }
 
 func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
@@ -76,26 +83,26 @@ func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to database: %v", err)
 	}
-	repo.Slog().Info("connection established")
+	repo.Slog().Debug("connection established")
 
 	if err := repo.Ping(); err != nil {
 		return nil, fmt.Errorf("unable to ping database: %v", err)
 	}
-	repo.Slog().Info("ping is successful")
+	repo.Slog().Debug("ping is successful")
 
 	if err := repo.InitializeTables(); err != nil {
 		return nil, fmt.Errorf("unable to initialize database tables: %v", err)
 	}
-	repo.Slog().Info("tables initialized successfully")
+	repo.Slog().Debug("tables initialized successfully")
 
 	return repo, nil
 }
 
 func initWatchers(cfg config.Watchers) ([]watcher.Watcher, error) {
-	watchers := ([]watcher.Watcher{
+	watchers := []watcher.Watcher{
 		grafanadashboards.NewWatcher(cfg.Grafanadasboards),
 		dockerregistry.NewWatcher(cfg.Dockerregistry),
-	})
+	}
 	return watchers, nil
 }
 
@@ -103,11 +110,11 @@ func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
 	webhooks := []webhook.Webhook{
 		discrod.NewWebhook(cfg.Discord),
 	}
-	for _, w := range webhooks {
-		if err := webhook.Ping(w); err != nil {
-			return nil, fmt.Errorf("could not ping webhook %s: %v", w.Name(), err)
+	for _, wh := range webhooks {
+		if err := webhook.Ping(wh); err != nil {
+			return nil, fmt.Errorf("could not ping webhook %s: %v", wh.Name(), err)
 		}
-		w.Slog().Info("ping is successful")
+		wh.Slog().Debug("ping is successful")
 	}
 	return webhooks, nil
 }

@@ -2,6 +2,7 @@ package core
 
 import (
 	"fmt"
+	"log/slog"
 
 	"github.com/tcaty/update-watcher/internal/repository"
 	"github.com/tcaty/update-watcher/internal/watcher"
@@ -11,42 +12,75 @@ import (
 )
 
 func WatchForUpdates(wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) {
+	total, updated := 0, 0
+
+	slog.Info("starting watching for updates cycle")
+
 	for _, wt := range wts {
-		if err := watchForUpdates(wt, whs, r); err != nil {
+
+		wt.Slog().Debug("watching for updates")
+
+		wtTotal := len(wt.Targets())
+		wtUpdated, err := watchForUpdates(wt, whs, r)
+
+		if err != nil {
 			wt.Slog().Error("could not watch for updates", "error", err)
 		}
+
+		total += wtTotal
+		updated += wtUpdated
+
+		wt.Slog().Debug("processing results", "targets_total", wtTotal, "targets_updated", wtUpdated)
 	}
+
+	slog.Info("processing results", "targets_total", total, "targets_updated", updated)
 }
 
-func watchForUpdates(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) error {
+func watchForUpdates(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) (int, error) {
 	updatedTargetsHrefs := make([]*markdown.Href, 0)
 	targets := wt.Targets()
 	versionRecords, err := watcher.FetchLatestVersionRecords(wt, targets)
 
 	if err != nil {
-		return fmt.Errorf("could not fetch latest version records %s: %v", wt.Name(), err)
+		return 0, fmt.Errorf("could not fetch latest version records %s: %v", wt.Name(), err)
 	}
 
 	for t, v := range versionRecords {
+		wt.Slog().Debug("starting version record update", "target", t, "version", v)
 		updated, err := r.UpdateVersionRecord(t, v)
+
 		if err != nil {
-			return fmt.Errorf("could not update version record: %v", err)
+			// should we return err here or just write to log like this?
+			wt.Slog().Error("could not update version record", "error", err)
 		}
+
 		// TODO: remove ! sign
 		if !updated {
 			href := wt.CreateHref(t, v)
 			updatedTargetsHrefs = append(updatedTargetsHrefs, href)
 		}
+
+		wt.Slog().Debug("processing results", "target", t, "version", v, "updated", updated)
 	}
 
+	whNotified := 0
 	for _, wh := range whs {
 		msg := createMessage(wt, updatedTargetsHrefs)
 		if err := webhook.Notify(wh, msg); err != nil {
-			return fmt.Errorf("could not notify: %v", err)
+			// should we return err here or just write to log like this?
+			wh.Slog().Error("could not notify", "error", err)
 		}
+		whNotified += 1
+		wt.Slog().Debug(
+			"webhook notified",
+			"webhook", wh.Name(),
+			"targets_total", len(targets),
+			"targets_updated", len(updatedTargetsHrefs),
+		)
 	}
+	wt.Slog().Info("webhooks notified", "notified_count", whNotified)
 
-	return nil
+	return len(updatedTargetsHrefs), nil
 }
 
 func createMessage(wt watcher.Watcher, hrefs []*markdown.Href) *webhook.Message {

@@ -101,3 +101,11 @@ webhooks:
     # -- override webhook name
     # default value is slack
     name: slack
+
+
+# -- logger configuration
+logger:
+  # -- log level setting
+  # values "DEBUG", "INFO", "WARN", "ERROR"
+  # default value in "INFO"
+  logLevel: INFO

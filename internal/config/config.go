@@ -2,13 +2,13 @@ package config
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 
 	"github.com/spf13/viper"
 )
 
 type Config struct {
+	Logger     Logger     `yaml:"logger"`
 	CronJob    CronJob    `yaml:"cronjob"`
 	Watchers   Watchers   `yaml:"watchers"`
 	Postgresql Postgresql `yaml:"postgresql"`
@@ -37,7 +37,6 @@ func Parse(cfgFile string) (*Config, error) {
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("error occured during reading config file: %v", err)
 	}
-	slog.Info("reading config...", "configFile", viper.ConfigFileUsed())
 
 	err := viper.Unmarshal(&cfg)
 	return cfg, err
