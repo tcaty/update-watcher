@@ -3,9 +3,11 @@ cronjob:
   # -- crontab configuration defines job schedule 
   # using standard the crontab syntax `* * * * *`
   # cron schedule expressions editor https://crontab.guru/
+  # optional, default values is "0 */12 * * *"
   crontab: "* * * * * *"
   # -- enables usage of optional 6th field in crontab
   # if set to true syntax `* * * * * *` is allowed
+  # optional, default values is false
   withSeconds: true
 
 
@@ -13,10 +15,10 @@ watchers:
   # -- grafanadasboards watcher configuration
   grafanadasboards:
     # -- enable watcher
-    # default value is false
+    # optional, default values is false
     enabled: true
     # -- override watcher name
-    # default value grafanadasboards
+    # optional, default values is "grafanadasboards"
     name: grafanadashboards
     # -- specify dashboards ids to watch for updates
     # name:  dashboard name to display
@@ -29,25 +31,27 @@ watchers:
     # -- webhook embed message settings
     embed: 
       # -- embed message avatar url
-      # default is grafana logo
+      # optional, default value is "https://cdn.icon-icons.com/icons2/2699/PNG/512/grafana_logo_icon_171048.png"
       avatar: "https://cdn.icon-icons.com/icons2/2699/PNG/512/grafana_logo_icon_171048.png"
       # -- embed message color, you have to use Decimal numeral system
+      # optional, default value is 16296468
       color: 16296468
       # -- embed message text that displays above versions list
+      # optional, default value is "New revesions released! Checkout:"
       text: "New revesions released! Checkout:"
 
   # -- dockerregistry watcher configuration
   dockerregistry:
     # -- enable watcher
-    # default value is false
+    # optional, default values is false
     enabled: true
     # -- override watcher name
-    # default value dockerregistry
+    # optional, default values is "dockerregistry"
     name: dockerregistry
     # -- specify images to watch for updates
     # name:       image name to watch for update
     # allowTags:  image tags regexp that are allowed
-    # default value is ".+" that match everything
+    #             optional, default value is ".+"
     images:
       - name: vitess/lite
         allowTags: .+
@@ -56,11 +60,13 @@ watchers:
     # -- webhook embed message settings
     embed: 
       # -- embed message avatar url
-      # default is docker logo
+      # optional, default value is "https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png"
       avatar: "https://cdn4.iconfinder.com/data/icons/logos-and-brands/512/97_Docker_logo_logos-512.png"
       # -- embed message color, you have to use Decimal numeral system
+      # optional, default value is 242424
       color: 242424
       # -- embed message text that displays above versions list
+      # optional, default value is "New tags released! Checkout:"
       text: "New tags released! Checkout:"
         
 
@@ -84,10 +90,10 @@ webhooks:
   # -- discord webhook configuration
   discord:
     # -- enable webhook
-    # default value is false
+    # optional, default value is false
     enabled: true
     # -- override webhook name
-    # default value is discord
+    # optional, default value is "discord"
     name: discord
     # -- secret webhook url
     url: "<webhook url>"
@@ -96,10 +102,10 @@ webhooks:
   # TODO: implement this webhook
   slack: 
     # -- enable webhook
-    # default value is false
+    # optional, default value is false
     enabled: false
     # -- override webhook name
-    # default value is slack
+    # optional, default value is "slack"
     name: slack
 
 
@@ -107,5 +113,5 @@ webhooks:
 logger:
   # -- log level setting
   # values "DEBUG", "INFO", "WARN", "ERROR"
-  # default value in "INFO"
+  # optional, default value in "INFO"
   logLevel: INFO
