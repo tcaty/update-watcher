@@ -19,9 +19,10 @@ type Webhook struct {
 
 func NewWebhook(cfg config.Discord) *Webhook {
 	return &Webhook{
-		slog: slog.Default().With("webhook", cfg.Name),
-		name: cfg.Name,
-		url:  cfg.Url,
+		slog:    slog.Default().With("webhook", cfg.Name),
+		enabled: cfg.Enabled,
+		name:    cfg.Name,
+		url:     cfg.Url,
 	}
 }
 

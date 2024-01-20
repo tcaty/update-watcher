@@ -18,7 +18,6 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: omit disabled
 // TODO: test on real dockerregistry
 // TODO: Dockerfile
 
@@ -109,20 +108,34 @@ func initWatchers(cfg config.Watchers) ([]watcher.Watcher, error) {
 		grafanadashboards.NewWatcher(cfg.Grafanadasboards),
 		dockerregistry.NewWatcher(cfg.Dockerregistry),
 	}
-	return watchers, nil
+	filtered := utils.FilterArr(
+		watchers,
+		func(wt watcher.Watcher) bool {
+			wt.Slog().Debug("filtering watchers", "enabled", wt.Enabled())
+			return wt.Enabled()
+		},
+	)
+	return filtered, nil
 }
 
 func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
 	webhooks := []webhook.Webhook{
 		discrod.NewWebhook(cfg.Discord),
 	}
-	for _, wh := range webhooks {
+	filtered := utils.FilterArr(
+		webhooks,
+		func(wh webhook.Webhook) bool {
+			wh.Slog().Debug("filtering webhooks", "enabled", wh.Enabled())
+			return wh.Enabled()
+		},
+	)
+	for _, wh := range filtered {
 		if err := webhook.Ping(wh); err != nil {
 			return nil, fmt.Errorf("could not ping webhook %s: %v", wh.Name(), err)
 		}
 		wh.Slog().Debug("ping is successful")
 	}
-	return webhooks, nil
+	return filtered, nil
 }
 
 func initScheduler(cfg config.CronJob, wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) (gocron.Scheduler, error) {
