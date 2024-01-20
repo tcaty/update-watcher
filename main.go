@@ -18,7 +18,9 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: complete logging
+// TODO: omit disabled
+// TODO: test on real dockerregistry
+// TODO: Dockerfile
 
 func main() {
 	flags := cmd.Execute()
@@ -59,6 +61,11 @@ func main() {
 	defer s.Shutdown()
 
 	slog.Info("everything is ready. starting watching for updates.")
+
+	if cfg.CronJob.ExecImmediate {
+		core.WatchForUpdates(wts, whs, repo)
+	}
+
 	// block current channel to run cronjob
 	// see: https://github.com/go-co-op/gocron/issues/647
 	select {}

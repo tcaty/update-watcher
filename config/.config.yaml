@@ -4,11 +4,14 @@ cronjob:
   # using standard the crontab syntax `* * * * *`
   # cron schedule expressions editor https://crontab.guru/
   # optional, default values is "0 */12 * * *"
-  crontab: "* * * * * *"
+  crontab: "0 */12 * * *"
   # -- enables usage of optional 6th field in crontab
   # if set to true syntax `* * * * * *` is allowed
   # optional, default values is false
-  withSeconds: true
+  withSeconds: false
+  # -- execute job immediate
+  # optional, default value is false
+  execImmediate: true
 
 
 watchers:

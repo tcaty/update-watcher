@@ -47,6 +47,7 @@ func setDefaultValues() {
 	// -- crontab
 	viper.SetDefault("crontab.crontab", "0 */12 * * *")
 	viper.SetDefault("crontab.withSeconds", false)
+	viper.SetDefault("crontab.execImmediate", false)
 
 	// -- watchers
 	// grafanadashboards
