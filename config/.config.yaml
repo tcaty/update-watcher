@@ -101,16 +101,6 @@ webhooks:
     # -- secret webhook url
     url: "<webhook url>"
     
-  # -- slack webhook configuration
-  # TODO: implement this webhook
-  slack: 
-    # -- enable webhook
-    # optional, default value is false
-    enabled: false
-    # -- override webhook name
-    # optional, default value is "slack"
-    name: slack
-
 
 # -- logger configuration
 logger:

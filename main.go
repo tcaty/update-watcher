@@ -18,7 +18,6 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: test on real dockerregistry
 // TODO: Dockerfile
 
 func main() {

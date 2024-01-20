@@ -54,13 +54,19 @@ func watchForUpdates(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Re
 			wt.Slog().Error("could not update version record", "error", err)
 		}
 
-		// TODO: remove ! sign
-		if !updated {
+		if updated {
 			href := wt.CreateHref(t, v)
 			updatedTargetsHrefs = append(updatedTargetsHrefs, href)
 		}
 
 		wt.Slog().Debug("processing results", "target", t, "version", v, "updated", updated)
+	}
+
+	// if there are no relevant updates
+	// then we don't need any notifications
+	// stop func execution without error
+	if len(updatedTargetsHrefs) == 0 {
+		return 0, nil
 	}
 
 	whNotified := 0
