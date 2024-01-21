@@ -6,6 +6,6 @@ import (
 )
 
 func HandleFatal(message string, err error) {
-	slog.Error(message, err)
+	slog.Error(message, "error", err)
 	os.Exit(1)
 }

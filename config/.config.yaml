@@ -84,7 +84,10 @@ postgresql:
   # should match with POSTGRES_PASSWORD in docker-compose.dev.yaml
   password: changeme
   # -- postgresql host
-  host: 0.0.0.0
+  # for docker-compose.dev.yaml
+  # host: 0.0.0.0
+  # for docker-compose.yaml
+  host: postgresql
   # -- postgresql port
   port: 5432
   

@@ -20,7 +20,7 @@ var (
 
 func Execute() *Flags {
 	if err := rootCmd.Execute(); err != nil {
-		slog.Error(err.Error())
+		slog.Error("rotCmd execute occured error", "error", err.Error())
 		os.Exit(1)
 	}
 	return rootFlags

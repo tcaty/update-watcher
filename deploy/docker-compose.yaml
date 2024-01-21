@@ -1,0 +1,20 @@
+version: "3"
+  
+services:
+  update-watcher:
+    image: tcaty/update-watcher
+    command: [ "--config=/config.yaml" ]
+    volumes:
+      - ../config/config.yaml:/config.yaml
+
+  postgresql:
+    image: postgres:15.5
+    environment:
+      - POSTGRES_DB=update-watcher
+      - POSTGRES_USER=update-watcher
+      - POSTGRES_PASSWORD=changeme
+    volumes:
+      - postgresql-data:/var/lib/postgresql/data
+        
+volumes:
+  postgresql-data:
