@@ -18,8 +18,6 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: Dockerfile
-
 func main() {
 	flags := cmd.Execute()
 	cfg, err := config.Parse(flags.CfgFile)
