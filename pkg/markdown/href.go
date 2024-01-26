@@ -15,6 +15,6 @@ func NewHref(text string, link string) *Href {
 }
 
 // Sprint creates the markdown href and returns the resulting string.
-func (h *Href) Sprint() string {
+func (h *Href) String() string {
 	return fmt.Sprintf("[%s](%s)", h.text, h.link)
 }

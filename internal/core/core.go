@@ -91,7 +91,7 @@ func watchForUpdates(wt watcher.Watcher, whs []webhook.Webhook, r *repository.Re
 
 func createMessage(wt watcher.Watcher, hrefs []*markdown.Href) *webhook.Message {
 	list := markdown.CreateUnorderedList(
-		utils.MapArr(hrefs, func(h *markdown.Href) string { return h.Sprint() }),
+		utils.MapArr(hrefs, func(h *markdown.Href) string { return h.String() }),
 	)
 	descr := fmt.Sprintf("%s\n%s", wt.Embed().Text, list)
 	msg := &webhook.Message{
