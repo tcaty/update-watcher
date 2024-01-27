@@ -1,10 +1,8 @@
 package cmd
 
 import (
-	"log/slog"
-	"os"
-
 	"github.com/spf13/cobra"
+	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
 type Flags struct {
@@ -20,12 +18,13 @@ var (
 
 func Execute() *Flags {
 	if err := rootCmd.Execute(); err != nil {
-		slog.Error("rotCmd execute occured error", "error", err.Error())
-		os.Exit(1)
+		utils.HandleFatal("rotCmd execute occured error", err)
 	}
 	return rootFlags
 }
 
 func init() {
-	rootCmd.PersistentFlags().StringVarP(&rootFlags.CfgFile, "config", "c", "", "config file path (default is $HOME/config.yaml)")
+	rootCmd.PersistentFlags().StringVarP(
+		&rootFlags.CfgFile, "config", "c", "", "config file path (default is $HOME/config.yaml)",
+	)
 }
