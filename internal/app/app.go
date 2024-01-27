@@ -32,8 +32,10 @@ func Run(cfg config.Config) {
 		utils.HandleFatal("could not initialize webhooks", err)
 	}
 
+	core := core.New(repo, wts, whs)
+
 	slog.Info("initializing scheduler...")
-	s, err := initScheduler(cfg.CronJob, wts, whs, repo)
+	s, err := initScheduler(cfg.CronJob, core)
 	if err != nil {
 		utils.HandleFatal("could not initialize scheduler", err)
 	}
@@ -43,7 +45,7 @@ func Run(cfg config.Config) {
 	slog.Info("everything is ready. starting watching for updates.")
 
 	if cfg.CronJob.ExecImmediate {
-		core.WatchForUpdates(wts, whs, repo)
+		core.WatchForUpdates()
 	}
 
 	// block current channel to run cronjob

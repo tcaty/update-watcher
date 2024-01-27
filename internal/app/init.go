@@ -85,14 +85,14 @@ func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
 	return filtered, nil
 }
 
-func initScheduler(cfg config.CronJob, wts []watcher.Watcher, whs []webhook.Webhook, r *repository.Repository) (gocron.Scheduler, error) {
+func initScheduler(cfg config.CronJob, core *core.Core) (gocron.Scheduler, error) {
 	s, err := gocron.NewScheduler()
 	if err != nil {
 		return nil, fmt.Errorf("could not create scheduler: %v", err)
 	}
 	s.NewJob(
 		gocron.CronJob(cfg.Crontab, cfg.WithSeconds),
-		gocron.NewTask(core.WatchForUpdates, wts, whs, r),
+		gocron.NewTask(core.WatchForUpdates),
 	)
 	return s, nil
 }
