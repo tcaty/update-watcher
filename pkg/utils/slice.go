@@ -17,3 +17,12 @@ func FilterArr[T comparable](arr []T, callback func(v T) bool) []T {
 	}
 	return newArr
 }
+
+// convert slice []T to []V
+func ConvertSlice[T comparable, V comparable](s []T) []V {
+	res := make([]V, 0, len(s))
+	for _, t := range s {
+		res = append(res, any(t).(V))
+	}
+	return res
+}

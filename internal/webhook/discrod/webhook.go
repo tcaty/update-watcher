@@ -1,17 +1,15 @@
 package discrod
 
 import (
-	"bytes"
 	"fmt"
-	"log/slog"
+	"net/http"
 
+	"github.com/imroc/req/v3"
 	"github.com/tcaty/update-watcher/internal/config"
-	"github.com/tcaty/update-watcher/internal/webhook"
-	"github.com/tcaty/update-watcher/pkg/utils"
+	"github.com/tcaty/update-watcher/internal/core"
 )
 
 type Webhook struct {
-	slog    *slog.Logger
 	enabled bool
 	name    string
 	url     string
@@ -19,45 +17,34 @@ type Webhook struct {
 
 func NewWebhook(cfg config.Discord) *Webhook {
 	return &Webhook{
-		slog:    slog.Default().With("webhook", cfg.Name),
 		enabled: cfg.Enabled,
 		name:    cfg.Name,
 		url:     cfg.Url,
 	}
 }
 
-func (wh *Webhook) Slog() *slog.Logger {
-	return wh.slog
-}
-
 func (wh *Webhook) Enabled() bool {
 	return wh.enabled
 }
 
-func (wh *Webhook) Name() string {
-	return wh.name
+func (wh *Webhook) Notify(msg core.Message) error {
+	payload := createPayload(msg)
+
+	_, err := req.C().R().
+		SetBody(payload).
+		Post(wh.url)
+
+	return err
 }
 
-func (wh *Webhook) Url() string {
-	return wh.url
-}
+func (wh *Webhook) Ping() error {
+	var err error
+	resp, err := req.C().R().
+		Post(wh.url)
 
-func (wh *Webhook) CreatePayload(msg *webhook.Message) (*bytes.Buffer, error) {
-	author := Author{
-		Name:    msg.Author,
-		IconUrl: msg.Avatar,
+	if resp.StatusCode != http.StatusBadRequest {
+		err = fmt.Errorf("response with status code %d", resp.StatusCode)
 	}
-	embed := Embed{
-		Author:      author,
-		Description: msg.Description,
-		Color:       msg.Color,
-	}
-	message := Message{
-		Embeds: []Embed{embed},
-	}
-	payload, err := utils.CreateHttpRequestPayload(message)
-	if err != nil {
-		return nil, fmt.Errorf("could not create http request payload: %v", err)
-	}
-	return payload, nil
+
+	return err
 }

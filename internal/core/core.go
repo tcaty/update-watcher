@@ -29,31 +29,31 @@ func New(repo Repository, wts []Watcher, whs []Webhook) *Core {
 	}
 }
 
-func (core *Core) WatchForUpdates() {
-	for _, wt := range core.wts {
+func (c *Core) WatchForUpdates() {
+	for _, wt := range c.wts {
 		vrs, err := wt.FetchLatestVersionRecords()
 		if err != nil {
-			fmt.Println("error")
+			fmt.Println(err)
 		}
 
-		updatedVrs := core.updateVersionRecords(vrs)
+		updatedVrs := c.updateVersionRecords(vrs)
 
 		if len(updatedVrs) == 0 {
 			return
 		}
 
 		msg := wt.CreateMessageAboutUpdates(updatedVrs)
-		core.notifyAboutUpdates(msg)
+		c.notifyAboutUpdates(msg)
 	}
 }
 
-func (core *Core) updateVersionRecords(vrs VersionRecords) VersionRecords {
+func (c *Core) updateVersionRecords(vrs VersionRecords) VersionRecords {
 	updatedVrs := make(VersionRecords)
 
 	for t, v := range vrs {
-		updated, err := core.repo.UpdateVersionRecord(t, v)
+		updated, err := c.repo.UpdateVersionRecord(t, v)
 		if err != nil {
-			fmt.Println("error")
+			fmt.Println(err)
 		}
 
 		if updated {
@@ -64,10 +64,10 @@ func (core *Core) updateVersionRecords(vrs VersionRecords) VersionRecords {
 	return updatedVrs
 }
 
-func (core *Core) notifyAboutUpdates(msg Message) {
-	for _, wh := range core.whs {
+func (c *Core) notifyAboutUpdates(msg Message) {
+	for _, wh := range c.whs {
 		if err := wh.Notify(msg); err != nil {
-			fmt.Println("error")
+			fmt.Println(err)
 		}
 	}
 }

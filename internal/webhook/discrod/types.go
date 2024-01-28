@@ -1,6 +1,6 @@
 package discrod
 
-type Message struct {
+type Payload struct {
 	Username        string          `json:"username,omitempty"`
 	AvatarUrl       string          `json:"avatar_url,omitempty"`
 	Content         string          `json:"content,omitempty"`

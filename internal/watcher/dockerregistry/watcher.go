@@ -1,20 +1,17 @@
 package dockerregistry
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
 	"fmt"
-	"log/slog"
 	"regexp"
 
+	"github.com/imroc/req/v3"
 	"github.com/tcaty/update-watcher/internal/config"
+	"github.com/tcaty/update-watcher/internal/core"
 	"github.com/tcaty/update-watcher/pkg/markdown"
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
 type Watcher struct {
-	slog    *slog.Logger
 	enabled bool
 	name    string
 	baseUrl string
@@ -36,7 +33,6 @@ func NewWatcher(cfg config.Dockerregistry) *Watcher {
 		}
 	})
 	return &Watcher{
-		slog:    slog.Default().With("watcher", cfg.Name),
 		enabled: cfg.Enabled,
 		name:    cfg.Name,
 		baseUrl: baseUrl,
@@ -45,69 +41,71 @@ func NewWatcher(cfg config.Dockerregistry) *Watcher {
 	}
 }
 
-func (wt *Watcher) Slog() *slog.Logger {
-	return wt.slog
-}
-
 func (wt *Watcher) Enabled() bool {
 	return wt.enabled
 }
 
-func (wt *Watcher) Name() string {
-	return wt.name
-}
+func (wt *Watcher) FetchLatestVersionRecords() (core.VersionRecords, error) {
+	vrs := make(core.VersionRecords, len(wt.targets()))
 
-func (wt *Watcher) Targets() []string {
-	targets := utils.MapArr(wt.images, func(i image) string { return i.name })
-	return targets
-}
-
-func (wt *Watcher) Embed() *config.Embed {
-	return wt.embed
-}
-
-func (wt *Watcher) CreateUrl(image string) (string, error) {
-	b := []byte(image)
-	i := bytes.IndexByte(b, byte('/'))
-
-	if i < 0 {
-		return "", errors.New("docker image should fit the format {namespace}/{repository}")
-	}
-
-	ns, repo := string(b[:i]), string(b[i+1:])
-	url := fmt.Sprintf("%s/namespaces/%s/repositories/%s/tags", wt.baseUrl, ns, repo)
-
-	return url, nil
-}
-
-func (wt *Watcher) CreateHref(target string, version string) *markdown.Href {
-	text := fmt.Sprintf("%s:%s", target, version)
-	link := fmt.Sprintf("https://hub.docker.com/r/%s/tags", target)
-	href := markdown.NewHref(text, link)
-	return href
-}
-
-func (wt *Watcher) GetLatestVersion(data []byte, target string) (string, error) {
-	var tags Tags
-
-	if err := json.Unmarshal(data, &tags); err != nil {
-		return "", fmt.Errorf("cannot unmarshal json: %v", err)
-	}
-
-	for _, t := range tags.Results {
-		tag := t.Name
-		allowTags := wt.getAllowedTagsByName(target)
-		match, err := regexp.MatchString(allowTags, tag)
+	for _, t := range wt.targets() {
+		url, err := wt.createUrl(t)
 		if err != nil {
-			return "", fmt.Errorf("wrong regexp pattern: %v", err)
+			return nil, err
 		}
-		if match {
-			return tag, nil
+
+		var tags Tags
+		_, err = req.C().R().
+			SetSuccessResult(&tags).
+			Get(url)
+
+		if err != nil {
+			return nil, err
+		}
+
+		for _, r := range tags.Results {
+			tag := r.Name
+			allowedTags := wt.getAllowedTagsByName(tag)
+			match, err := regexp.MatchString(allowedTags, tag)
+			if err != nil {
+				return nil, err
+			}
+			if match {
+				vrs[t] = tag
+				break
+			}
 		}
 	}
 
-	// if there are no tags except latest, only then return it
-	return "latest", nil
+	return vrs, nil
+}
+
+func (wt *Watcher) CreateMessageAboutUpdates(vrs core.VersionRecords) core.Message {
+	hrefs := createHrefs(vrs)
+	ul := markdown.CreateUnorderedList(hrefs)
+	descr := fmt.Sprintf("%s\n%s", wt.embed.Text, ul)
+	msg := core.Message{
+		Author:      wt.name,
+		Avatar:      wt.embed.Avatar,
+		Description: descr,
+		Color:       wt.embed.Color,
+	}
+	return msg
+}
+
+func (wt *Watcher) targets() []string {
+	ts := utils.MapArr(wt.images, func(i image) string { return i.name })
+	return ts
+}
+
+func (wt *Watcher) createUrl(image string) (string, error) {
+	ns, repo, err := splitNsAndRepo(image)
+	if err != nil {
+		return "", err
+	}
+
+	url := fmt.Sprintf("%s/namespaces/%s/repositories/%s/tags", wt.baseUrl, ns, repo)
+	return url, nil
 }
 
 func (wt *Watcher) getAllowedTagsByName(name string) string {

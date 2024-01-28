@@ -9,12 +9,10 @@ import (
 	"github.com/tcaty/update-watcher/internal/config"
 	"github.com/tcaty/update-watcher/internal/core"
 	"github.com/tcaty/update-watcher/internal/repository"
-	"github.com/tcaty/update-watcher/internal/watcher"
 	"github.com/tcaty/update-watcher/internal/watcher/dockerregistry"
 	"github.com/tcaty/update-watcher/internal/watcher/grafanadashboards"
-	"github.com/tcaty/update-watcher/internal/webhook"
 	"github.com/tcaty/update-watcher/internal/webhook/discrod"
-	"github.com/tcaty/update-watcher/pkg/utils"
+	"github.com/tcaty/update-watcher/pkg/inits"
 )
 
 func initLogger(cfg config.Logger) error {
@@ -50,39 +48,24 @@ func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
 	return repo, nil
 }
 
-func initWatchers(cfg config.Watchers) ([]watcher.Watcher, error) {
-	watchers := []watcher.Watcher{
+func initWatchers(cfg config.Watchers) ([]core.Watcher, error) {
+	wts := []core.Watcher{
 		grafanadashboards.NewWatcher(cfg.Grafanadasboards),
 		dockerregistry.NewWatcher(cfg.Dockerregistry),
 	}
-	filtered := utils.FilterArr(
-		watchers,
-		func(wt watcher.Watcher) bool {
-			wt.Slog().Debug("filtering watchers", "enabled", wt.Enabled())
-			return wt.Enabled()
-		},
-	)
-	return filtered, nil
+	wts = inits.ExcludeDisabledGeneric(wts)
+	return wts, nil
 }
 
-func initWebhooks(cfg config.Webhooks) ([]webhook.Webhook, error) {
-	webhooks := []webhook.Webhook{
+func initWebhooks(cfg config.Webhooks) ([]core.Webhook, error) {
+	whs := []core.Webhook{
 		discrod.NewWebhook(cfg.Discord),
 	}
-	filtered := utils.FilterArr(
-		webhooks,
-		func(wh webhook.Webhook) bool {
-			wh.Slog().Debug("filtering webhooks", "enabled", wh.Enabled())
-			return wh.Enabled()
-		},
-	)
-	for _, wh := range filtered {
-		if err := webhook.Ping(wh); err != nil {
-			return nil, fmt.Errorf("could not ping webhook %s: %v", wh.Name(), err)
-		}
-		wh.Slog().Debug("ping is successful")
+	whs = inits.ExcludeDisabledGeneric(whs)
+	if err := inits.PingAllGeneric(whs); err != nil {
+		return nil, fmt.Errorf("unable ping webhook: %v", err)
 	}
-	return filtered, nil
+	return whs, nil
 }
 
 func initScheduler(cfg config.CronJob, core *core.Core) (gocron.Scheduler, error) {
