@@ -1,14 +1,18 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/tcaty/update-watcher/internal/entities"
+)
 
 type Repository interface {
-	UpdateVersionRecord(target string, version string) (bool, error)
+	UpdateVersionRecord(vr entities.VersionRecord) (bool, error)
 }
 
 type Watcher interface {
-	FetchLatestVersionRecords() (VersionRecords, error)
-	CreateMessageAboutUpdates(vrs VersionRecords) Message
+	FetchLatestVersionRecords() ([]entities.VersionRecord, error)
+	CreateMessageAboutUpdates(vrs []entities.VersionRecord) Message
 }
 
 type Webhook interface {
@@ -47,17 +51,17 @@ func (c *Core) WatchForUpdates() {
 	}
 }
 
-func (c *Core) updateVersionRecords(vrs VersionRecords) VersionRecords {
-	updatedVrs := make(VersionRecords)
+func (c *Core) updateVersionRecords(vrs []entities.VersionRecord) []entities.VersionRecord {
+	updatedVrs := make([]entities.VersionRecord, 0)
 
-	for t, v := range vrs {
-		updated, err := c.repo.UpdateVersionRecord(t, v)
+	for _, vr := range vrs {
+		updated, err := c.repo.UpdateVersionRecord(vr)
 		if err != nil {
 			fmt.Println(err)
 		}
 
 		if updated {
-			updatedVrs[t] = v
+			updatedVrs = append(updatedVrs, vr)
 		}
 	}
 

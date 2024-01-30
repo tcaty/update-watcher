@@ -6,6 +6,7 @@ import (
 	"github.com/imroc/req/v3"
 	"github.com/tcaty/update-watcher/internal/config"
 	"github.com/tcaty/update-watcher/internal/core"
+	"github.com/tcaty/update-watcher/internal/entities"
 	"github.com/tcaty/update-watcher/pkg/markdown"
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
@@ -43,11 +44,11 @@ func (wt *Watcher) Enabled() bool {
 	return wt.enabled
 }
 
-func (wt *Watcher) FetchLatestVersionRecords() (core.VersionRecords, error) {
-	vrs := make(core.VersionRecords, len(wt.targets()))
+func (wt *Watcher) FetchLatestVersionRecords() ([]entities.VersionRecord, error) {
+	vrs := make([]entities.VersionRecord, 0, len(wt.targets()))
 
-	for _, t := range wt.targets() {
-		url := wt.createUrl(t)
+	for _, target := range wt.targets() {
+		url := wt.createUrl(target)
 
 		var revisions Revisions
 		var _, err = req.C().R().
@@ -58,13 +59,17 @@ func (wt *Watcher) FetchLatestVersionRecords() (core.VersionRecords, error) {
 			return nil, err
 		}
 
-		vrs[t] = getLatestRevision(revisions)
+		vr := entities.VersionRecord{
+			Target:  target,
+			Version: getLatestRevision(revisions),
+		}
+		vrs = append(vrs, vr)
 	}
 
 	return vrs, nil
 }
 
-func (wt *Watcher) CreateMessageAboutUpdates(vrs core.VersionRecords) core.Message {
+func (wt *Watcher) CreateMessageAboutUpdates(vrs []entities.VersionRecord) core.Message {
 	hrefs := createHrefs(vrs, wt.dashboards)
 	ul := markdown.CreateUnorderedList(hrefs)
 	descr := fmt.Sprintf("%s\n%s", wt.embed.Text, ul)

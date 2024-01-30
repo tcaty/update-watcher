@@ -28,22 +28,15 @@ func initLogger(cfg config.Logger) error {
 	return nil
 }
 
-func initRepo(cfg config.Postgresql) (*repository.Repository, error) {
+func initRepo(cfg config.Postgresql) (core.Repository, error) {
 	repo, err := repository.New(cfg)
 	if err != nil {
 		return nil, fmt.Errorf("unable to connect to database: %v", err)
 	}
-	repo.Slog().Debug("connection established")
 
 	if err := repo.Ping(); err != nil {
-		return nil, fmt.Errorf("unable to ping database: %v", err)
+		return nil, fmt.Errorf("could not ping database: %v", err)
 	}
-	repo.Slog().Debug("ping is successful")
-
-	if err := repo.InitializeTables(); err != nil {
-		return nil, fmt.Errorf("unable to initialize database tables: %v", err)
-	}
-	repo.Slog().Debug("tables initialized successfully")
 
 	return repo, nil
 }

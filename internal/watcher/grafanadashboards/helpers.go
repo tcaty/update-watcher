@@ -4,15 +4,16 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/tcaty/update-watcher/internal/core"
+	"github.com/tcaty/update-watcher/internal/entities"
 	"github.com/tcaty/update-watcher/pkg/markdown"
 )
 
-func createHrefs(vrs core.VersionRecords, dasdashboards []dashboard) []fmt.Stringer {
+func createHrefs(vrs []entities.VersionRecord, dasdashboards []dashboard) []fmt.Stringer {
 	hrefs := make([]fmt.Stringer, 0)
-	for t, v := range vrs {
-		text := fmt.Sprintf("%s revision %s", getDashboardNameById(t, dasdashboards), v)
-		link := fmt.Sprintf("https://grafana.com/grafana/dashboards/%s/?tab=revisions", t)
+	for _, vr := range vrs {
+		name := getDashboardNameById(vr.Target, dasdashboards)
+		text := fmt.Sprintf("%s revision %s", name, vr.Version)
+		link := fmt.Sprintf("https://grafana.com/grafana/dashboards/%s/?tab=revisions", vr.Target)
 		href := markdown.NewHref(text, link)
 		hrefs = append(hrefs, href)
 	}

@@ -7,6 +7,13 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
+// TODO move logger to pkg/, refactor logging implementation
+// TODO: move config files to config/, refactor this with cleanenv
+// TODO: refactor watchers
+// TODO: implement gorountines
+// TODO: add Makefile
+// TODO: update README
+
 func main() {
 	flags := cmd.Execute()
 	cfg, err := config.Parse(flags.CfgFile)

@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/tcaty/update-watcher/internal/core"
+	"github.com/tcaty/update-watcher/internal/entities"
 	"github.com/tcaty/update-watcher/pkg/markdown"
 )
 
@@ -21,11 +21,11 @@ func splitNsAndRepo(image string) (string, string, error) {
 	return ns, repo, nil
 }
 
-func createHrefs(vrs core.VersionRecords) []fmt.Stringer {
+func createHrefs(vrs []entities.VersionRecord) []fmt.Stringer {
 	hrefs := make([]fmt.Stringer, 0)
-	for t, v := range vrs {
-		text := fmt.Sprintf("%s:%s", t, v)
-		link := fmt.Sprintf("https://hub.docker.com/r/%s/tags", t)
+	for _, vr := range vrs {
+		text := fmt.Sprintf("%s:%s", vr.Target, vr.Version)
+		link := fmt.Sprintf("https://hub.docker.com/r/%s/tags", vr.Target)
 		href := markdown.NewHref(text, link)
 		hrefs = append(hrefs, href)
 	}
