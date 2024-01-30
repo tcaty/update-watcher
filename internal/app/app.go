@@ -19,8 +19,7 @@ func Run(cfg config.Config) {
 	if err != nil {
 		utils.HandleFatal("could not initialize repo", err)
 	}
-	// TODO: uncomment
-	// defer repo.(any).(*postgres.Postgres).Close()
+	defer repo.Close()
 
 	wts, err := initWatchers(cfg.Watchers)
 	if err != nil {
