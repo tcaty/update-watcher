@@ -81,7 +81,9 @@ func (p *Postgres) doesVersionRecordExist(vr entities.VersionRecord) (bool, erro
 		return false, fmt.Errorf("unable to check version record for existing: %v", err)
 	}
 
-	return id > 0, nil
+	exists := id > 0
+
+	return exists, nil
 }
 
 func (p *Postgres) insertVersionRecord(vr entities.VersionRecord) error {
