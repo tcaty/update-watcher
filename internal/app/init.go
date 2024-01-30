@@ -55,7 +55,7 @@ func initWebhooks(cfg config.Webhooks) ([]core.Webhook, error) {
 		discrod.NewWebhook(cfg.Discord),
 	}
 	whs = inits.ExcludeDisabledGeneric(whs)
-	if err := inits.PingAllGeneric(whs); err != nil {
+	if err := inits.PingGeneric(whs); err != nil {
 		return nil, fmt.Errorf("unable ping webhook: %v", err)
 	}
 	return whs, nil

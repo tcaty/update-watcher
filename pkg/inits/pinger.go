@@ -8,12 +8,12 @@ type Pinger interface {
 
 // like PingAll but convert to Pinger type before pinging
 // and convert to initial slice type after that
-func PingAllGeneric[T comparable](s []T) error {
+func PingGeneric[T comparable](s []T) error {
 	ps := utils.ConvertSlice[T, Pinger](s)
-	return PingAll(ps)
+	return Ping(ps)
 }
 
-func PingAll(ps []Pinger) error {
+func Ping(ps []Pinger) error {
 	for _, p := range ps {
 		if err := p.Ping(); err != nil {
 			return err
