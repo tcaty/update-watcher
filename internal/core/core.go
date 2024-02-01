@@ -1,7 +1,7 @@
 package core
 
 import (
-	"fmt"
+	"log/slog"
 
 	"github.com/tcaty/update-watcher/internal/entities"
 )
@@ -35,15 +35,26 @@ func New(repo Repository, wts []Watcher, whs []Webhook) *Core {
 
 func (c *Core) WatchForUpdates() {
 	for _, wt := range c.wts {
+		log := slog.With("watcher", wt)
+
+		log.Info("starting watching for updates cycle")
+
 		vrs, err := wt.FetchLatestVersionRecords()
+
 		if err != nil {
-			fmt.Println(err)
+			log.Error("error occured while fetching version records", "error", err)
 		}
 
 		updatedVrs := c.updateVersionRecords(vrs)
 
+		log.Info("processing results",
+			"targets_watched", len(vrs),
+			"targets_updated", len(updatedVrs),
+		)
+
 		if len(updatedVrs) == 0 {
-			return
+			log.Info("there are no updates. notifications won't be sent")
+			continue
 		}
 
 		msg := wt.CreateMessageAboutUpdates(updatedVrs)
@@ -55,14 +66,22 @@ func (c *Core) updateVersionRecords(vrs []entities.VersionRecord) []entities.Ver
 	updatedVrs := make([]entities.VersionRecord, 0)
 
 	for _, vr := range vrs {
+		log := slog.With(
+			"target", vr.Target,
+			"version", vr.Version,
+		)
+
 		updated, err := c.repo.UpdateVersionRecord(vr)
+
 		if err != nil {
-			fmt.Println(err)
+			log.Error("error occured while updating version record", "error", err)
 		}
 
 		if updated {
 			updatedVrs = append(updatedVrs, vr)
 		}
+
+		log.Debug("updating version record", "updated", updated)
 	}
 
 	return updatedVrs
@@ -70,8 +89,15 @@ func (c *Core) updateVersionRecords(vrs []entities.VersionRecord) []entities.Ver
 
 func (c *Core) notifyAboutUpdates(msg Message) {
 	for _, wh := range c.whs {
+		log := slog.With(
+			"webhook", wh,
+			"watcher", msg.Author,
+		)
+
 		if err := wh.Notify(msg); err != nil {
-			fmt.Println(err)
+			log.Error("error occured while notifying", "error", err)
+		} else {
+			log.Info("successfully notified")
 		}
 	}
 }

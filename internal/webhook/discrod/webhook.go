@@ -27,6 +27,10 @@ func (wh *Webhook) Enabled() bool {
 	return wh.enabled
 }
 
+func (wh *Webhook) String() string {
+	return wh.name
+}
+
 func (wh *Webhook) Notify(msg core.Message) error {
 	payload := createPayload(msg)
 

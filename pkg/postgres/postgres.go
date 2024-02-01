@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -23,6 +24,16 @@ func New(connString string) (*Postgres, error) {
 		Pool:    pool,
 		Builder: builder,
 	}, err
+}
+
+func (p *Postgres) ConnString() string {
+	return fmt.Sprintf(
+		"postgres://%s:xxx@%s:%d/%s",
+		p.Pool.Config().ConnConfig.User,
+		p.Pool.Config().ConnConfig.Host,
+		p.Pool.Config().ConnConfig.Port,
+		p.Pool.Config().ConnConfig.Database,
+	)
 }
 
 func (p *Postgres) Close() {

@@ -44,6 +44,10 @@ func (wt *Watcher) Enabled() bool {
 	return wt.enabled
 }
 
+func (wt *Watcher) String() string {
+	return wt.name
+}
+
 func (wt *Watcher) FetchLatestVersionRecords() ([]entities.VersionRecord, error) {
 	vrs := make([]entities.VersionRecord, 0, len(wt.targets()))
 

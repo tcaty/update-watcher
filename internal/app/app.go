@@ -13,7 +13,7 @@ func Run(cfg config.Config) {
 		utils.HandleFatal("could not init logger", err)
 	}
 
-	slog.Info("runnig app...")
+	slog.Info("runnig app")
 
 	repo, err := initRepo(cfg.Postgresql)
 	if err != nil {
@@ -40,9 +40,10 @@ func Run(cfg config.Config) {
 	s.Start()
 	defer s.Shutdown()
 
-	slog.Info("everything is ready. starting watching for updates.")
+	slog.Info("everything is ready. starting watching for updates")
 
 	if cfg.CronJob.ExecImmediate {
+		slog.Info("executing job immediate")
 		core.WatchForUpdates()
 	}
 
