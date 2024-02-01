@@ -1,0 +1,19 @@
+# -- postgres example configuration
+# don't forget export WEBHOOKS_DISCORD_URL env variable!
+
+watchers:
+  grafanadasboards:
+    enabled: true
+    dashboards:
+      - name: node-exporter-full
+        id: 1860
+
+          
+# variable which doesn't specified here
+# will be taken from env variables
+# postgres.user     from POSTGRES_USER
+# postgres.password from POSTGRES_PASSWORD
+postgres:
+  db: update-watcher
+  host: "0.0.0.0"
+  port: 5432

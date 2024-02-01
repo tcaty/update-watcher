@@ -1,16 +1,16 @@
 version: "3"
   
 services:
-  postgresql:
+  postgres:
     image: postgres:15.5
     environment:
-      - POSTGRES_DB=update-watcher
-      - POSTGRES_USER=update-watcher
-      - POSTGRES_PASSWORD=changeme
+      POSTGRES_DB: "update-watcher"
+      POSTGRES_USER: "update-watcher"
+      POSTGRES_PASSWORD: "changeme"
     ports:
       - "5432:5432"
     volumes:
-      - postgresql-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
         
 volumes:
-  postgresql-data:
+  postgres-data:

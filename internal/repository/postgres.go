@@ -16,7 +16,7 @@ type Postgres struct {
 	*postgres.Postgres
 }
 
-func New(cfg config.Postgresql) (*Postgres, error) {
+func New(cfg config.Postgres) (*Postgres, error) {
 	connString := fmt.Sprintf(
 		"postgres://%s:%s@%s:%d/%s",
 		cfg.User,

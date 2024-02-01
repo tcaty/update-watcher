@@ -1,3 +1,4 @@
+
 # -- cronjob configuration
 cronjob:
   # -- crontab configuration defines job schedule 
@@ -14,6 +15,7 @@ cronjob:
   execImmediate: true
 
 
+# -- watchers configuration
 watchers:
   # -- grafanadasboards watcher configuration
   grafanadasboards:
@@ -73,36 +75,45 @@ watchers:
       text: "New tags released! Checkout:"
         
 
-postgresql:
-  # -- postgresql database name
-  # should match with POSTGRES_DB in docker-compose.dev.yaml
-  database: update-watcher
-  # -- postgresql user
-  # should match with POSTGRES_USER in docker-compose.dev.yaml
+# -- postgres configuration
+# optional, this configuration could be set from env variables
+postgres:
+  # -- postgres database name
+  # optional, default value is "update-watcher"
+  # could be set by env variable POSTGRES_DB
+  db: update-watcher
+  # -- postgres user
+  # optional, default value is "update-watcher"
+  # could be set by env variable POSTGRES_USER
   user: update-watcher
-  # -- postgresql password
-  # should match with POSTGRES_PASSWORD in docker-compose.dev.yaml
+  # -- postgres password
+  # optional, default value is "changeme"
+  # could be set by env variable POSTGRES_PASSWORD
   password: changeme
-  # -- postgresql host
-  # for docker-compose.dev.yaml
-  # host: 0.0.0.0
-  # for docker-compose.yaml
-  host: postgresql
-  # -- postgresql port
+  # -- postgres host
+  # optional, default value is "0.0.0.0"
+  # could be set by env variable POSTGRES_HOST
+  host: "0.0.0.0"
+  # -- postgres port
+  # optional, default value is 5432
+  # could be set by env variable POSTGRES_PORT
   port: 5432
   
     
+# -- webhooks configuration
 webhooks:
   # -- discord webhook configuration
   discord:
     # -- enable webhook
-    # optional, default value is false
+    # optional, default value is true
     enabled: true
     # -- override webhook name
     # optional, default value is "discord"
     name: discord
     # -- secret webhook url
-    url: "<webhook url>"
+    # optional, default value is ""
+    # could be set by env variable WEBHOOKS_DISCORD_URL
+    url: ""
     
 
 # -- logger configuration

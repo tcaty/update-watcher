@@ -32,7 +32,7 @@ func initLogger(cfg config.Logger) error {
 	return nil
 }
 
-func initRepo(cfg config.Postgresql) (*repository.Postgres, error) {
+func initRepo(cfg config.Postgres) (*repository.Postgres, error) {
 	repo, err := repository.New(cfg)
 
 	if err != nil {

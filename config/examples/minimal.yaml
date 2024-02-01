@@ -1,0 +1,11 @@
+# -- minimal required configuration to watch for dockerregistry updates
+# don't forget export WEBHOOKS_DISCORD_URL env variable!
+
+watchers:
+  dockerregistry:
+    enabled: true
+    images:
+      - name: vitess/lite
+      - name: grafana/grafana
+        allowTags: 10\.0\.\d+
+        

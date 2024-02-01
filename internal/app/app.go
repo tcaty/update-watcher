@@ -15,7 +15,7 @@ func Run(cfg config.Config) {
 
 	slog.Info("runnig app")
 
-	repo, err := initRepo(cfg.Postgresql)
+	repo, err := initRepo(cfg.Postgres)
 	if err != nil {
 		utils.HandleFatal("could not initialize repo", err)
 	}

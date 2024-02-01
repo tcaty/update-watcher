@@ -1,20 +1,28 @@
 version: "3"
   
+x-default-environment: &default-environment
+  POSTGRES_DB: "update-watcher"
+  POSTGRES_USER: "update-watcher"
+  POSTGRES_PASSWORD: "changeme"
+
 services:
   update-watcher:
     image: tcaty/update-watcher
     command: [ "--config=/config.yaml" ]
+    environment:
+      <<: *default-environment
+      POSTGRES_HOST: "postgres"
+      POSTGRES_PORT: 5432
+      WEBHOOKS_DISCORD_URL: "<url>"
     volumes:
-      - ../config/config.yaml:/config.yaml
+      - ../config/examples/docker.yaml:/config.yaml
 
-  postgresql:
+  postgres:
     image: postgres:15.5
     environment:
-      - POSTGRES_DB=update-watcher
-      - POSTGRES_USER=update-watcher
-      - POSTGRES_PASSWORD=changeme
+      <<: *default-environment
     volumes:
-      - postgresql-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
         
 volumes:
-  postgresql-data:
+  postgres-data:
