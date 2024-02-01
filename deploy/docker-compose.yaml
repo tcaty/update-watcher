@@ -16,6 +16,8 @@ services:
       WEBHOOKS_DISCORD_URL: "<url>"
     volumes:
       - ../config/examples/docker.yaml:/config.yaml
+    depends_on:
+      - postgres
 
   postgres:
     image: postgres:15.5

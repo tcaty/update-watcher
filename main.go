@@ -7,7 +7,7 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: move config files to config/, refactor this with cleanenv
+// TODO: add migrations
 // TODO: refactor watchers
 // TODO: implement gorountines
 // TODO: add Makefile
