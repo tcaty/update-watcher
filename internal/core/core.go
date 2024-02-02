@@ -47,7 +47,8 @@ func (c *Core) WatchForUpdates() {
 
 		updatedVrs := c.updateVersionRecords(vrs)
 
-		log.Info("processing results",
+		log.Info(
+			"processing results",
 			"targets_watched", len(vrs),
 			"targets_updated", len(updatedVrs),
 		)
