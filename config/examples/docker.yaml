@@ -18,8 +18,8 @@ watchers:
   dockerregistry:
     enabled: true
     images:
-      - name: vitess/lite
-        allowTags: .+
+      - name: tcaty/nginx-hello
+        allowTags: 1\.0\.\d+
       - name: grafana/grafana
         allowTags: 10\.0\.\d+
         
