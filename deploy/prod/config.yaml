@@ -1,6 +1,6 @@
 # -- configuration for production mode
 # postgres and discord webhook configuration
-# specified in deploy/docker-compose.yaml services.update-watcher.environment
+# specified in docker-compose.yaml services.update-watcher.environment
 
 cronjob:
   execImmediate: true

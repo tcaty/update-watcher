@@ -7,10 +7,9 @@ import (
 	"github.com/tcaty/update-watcher/pkg/utils"
 )
 
-// TODO: add migrations
 // TODO: refactor watchers
 // TODO: implement gorountines
-// TODO: add Makefile
+// TODO: refactor Makefile
 // TODO: update README
 
 func main() {

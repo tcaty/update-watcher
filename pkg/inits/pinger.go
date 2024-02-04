@@ -1,6 +1,8 @@
 package inits
 
-import "github.com/tcaty/update-watcher/pkg/utils"
+import (
+	"github.com/tcaty/update-watcher/pkg/utils"
+)
 
 type Pinger interface {
 	Ping() error

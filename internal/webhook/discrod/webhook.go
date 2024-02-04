@@ -42,13 +42,16 @@ func (wh *Webhook) Notify(msg core.Message) error {
 }
 
 func (wh *Webhook) Ping() error {
-	var err error
 	resp, err := req.C().R().
-		Post(wh.url)
+		Get(wh.url)
 
-	if resp.StatusCode != http.StatusBadRequest {
-		err = fmt.Errorf("response with status code %d", resp.StatusCode)
+	if err != nil {
+		return err
 	}
 
-	return err
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("response with status code %d", resp.StatusCode)
+	}
+
+	return nil
 }

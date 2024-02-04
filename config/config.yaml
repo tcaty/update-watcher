@@ -1,4 +1,3 @@
-
 # -- cronjob configuration
 cronjob:
   # -- crontab configuration defines job schedule 

@@ -4,3 +4,4 @@
 vendor/
 Makefile
 README.md
+Dockerfile

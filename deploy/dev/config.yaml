@@ -1,0 +1,30 @@
+# -- configuration for development mode
+# postgres and discord webhook configuration
+# specified in docker-compose.yaml services.update-watcher.environment
+
+cronjob:
+  crontab: "*/15 * * * * *"
+  withSeconds: true
+  execImmediate: true
+
+
+watchers:
+  grafanadasboards:
+    enabled: true
+    dashboards:
+      - name: node-exporter-full
+        id: 1860
+      - name: prometheus-2-0-overview
+        id: 3662
+
+  dockerregistry:
+    enabled: true
+    images:
+      - name: tcaty/nginx-hello
+        allowTags: 1\.0\.\d+
+      - name: grafana/grafana
+        allowTags: 10\.0\.\d+
+        
+          
+logger:
+  logLevel: DEBUG

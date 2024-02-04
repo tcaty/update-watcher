@@ -34,13 +34,13 @@ func Parse(cfgFile string) (*Config, error) {
 	setDefaultValues()
 	bindEnv()
 
-	viper.AutomaticEnv()
-
 	if err := viper.ReadInConfig(); err != nil {
 		return nil, fmt.Errorf("error occured during reading config file: %v", err)
 	}
 
 	err := viper.Unmarshal(&cfg)
+	fmt.Println("prefix", viper.GetEnvPrefix(), os.Getenv("POSTGRES_HOST"))
+	fmt.Println(os.Getenv("POSTGRES_USER"))
 
 	return cfg, err
 }
@@ -59,4 +59,8 @@ func setDefaultValues() {
 func bindEnv() {
 	bindDiscordWebhookEnv()
 	bindPostgresEnv()
+}
+
+func init() {
+	viper.AutomaticEnv()
 }
