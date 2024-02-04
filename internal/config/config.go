@@ -39,8 +39,6 @@ func Parse(cfgFile string) (*Config, error) {
 	}
 
 	err := viper.Unmarshal(&cfg)
-	fmt.Println("prefix", viper.GetEnvPrefix(), os.Getenv("POSTGRES_HOST"))
-	fmt.Println(os.Getenv("POSTGRES_USER"))
 
 	return cfg, err
 }
