@@ -24,11 +24,13 @@ MAIN=main.go
 
 # -- Commads --
 
+.PHONY: prepare
 prepare:
-	cp ${ENV_EXAMPLE_DEV} ${ENV_DEV} \
-	&& cp ${ENV_EXAMPLE_PROD} ${ENV_PROD} \
+	cp -n ${ENV_EXAMPLE_DEV} ${ENV_DEV} \
+	&& cp -n ${ENV_EXAMPLE_PROD} ${ENV_PROD} \
 	&& go install -tags "postgres" github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 	
+.PHONY: run-dev
 run-dev: SHELL:=/bin/bash
 run-dev:
 	docker-compose -f ${COMPOSE_DEV} up -d --no-recreate \
@@ -36,15 +38,19 @@ run-dev:
 	&& source ${ENV_DEV} \
 	&& go run ${MAIN} --config ${CONFIG_DEV}
 	
+.PHONY: run-prod
 run-prod:
 	docker-compose -f ${COMPOSE_PROD} up -d
 
+.PHONY: build-binary
 build-binary:
 	go build -o ${BUILD_DIR}/app ${MAIN}
 
+.PHONY: build-docker
 build-docker:
 	docker build -t tcaty/update-watcher .
 	
+.PHONY: clean
 clean:
 	docker-compose -f ${COMPOSE_DEV} down --remove-orphans --volumes; \
 	docker-compose -f ${COMPOSE_PROD} down --remove-orphans --volumes; \

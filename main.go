@@ -9,8 +9,6 @@ import (
 
 // TODO: refactor watchers
 // TODO: implement gorountines
-// TODO: refactor Makefile
-// TODO: update README
 
 func main() {
 	flags := cmd.Execute()
